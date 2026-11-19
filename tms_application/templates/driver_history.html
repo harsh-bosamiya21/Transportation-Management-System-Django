@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+.history-page-wrapper {
+  background-color: #0b1528;
+  min-height: 100vh;
+  padding-top: 170px;
+  padding-bottom: 80px;
+  color: #e2e8f0;
+}
+
+.history-header {
+  background: linear-gradient(135deg, rgba(14, 29, 52, 0.95), rgba(7, 18, 38, 0.95));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.stats-card {
+  background: rgba(14, 29, 52, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px 22px;
+  transition: all 0.25s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+}
+
+.history-table-container {
+  background: rgba(14, 29, 52, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.history-table {
+  margin-bottom: 0;
+  color: #e2e8f0;
+}
+
+.history-table thead {
+  background: rgba(7, 16, 32, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-table th {
+  padding: 16px 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  border: none;
+}
+
+.history-table td {
+  padding: 18px 20px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-table tr:hover {
+  background: rgba(5, 148, 252, 0.05);
+}
+
+.btn-track {
+  background: rgba(5, 148, 252, 0.15);
+  border: 1px solid rgba(5, 148, 252, 0.3);
+  color: #38bdf8;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-track:hover {
+  background: #0594fc;
+  color: #fff;
+  transform: translateY(-2px);
+}
+</style>
+
+<main class="main history-page-wrapper">
+  <div class="container">
+
+    <!-- Header Section -->
+    <div class="history-header p-4 mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-success text-white text-uppercase px-3 py-1" style="font-size: 0.75rem; letter-spacing: 1px;">
+              <i class="bi bi-archive-fill me-1"></i> Completed Consignments Archive
+            </span>
+            <span class="text-white-50 small">Permanent Records</span>
+          </div>
+          <h1 class="display-6 fw-bold mb-1 text-white">
+            <i class="bi bi-clock-history text-success me-2"></i>Past Delivery History
+          </h1>
+          <p class="text-white-50 mb-0">
+            Log of all completed trips, safely delivered consignments, and fulfilled route assignments.
+          </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'driver_deliveries' %}" class="btn btn-primary px-4 py-2" style="border-radius: 25px; font-weight: 600;">
+            <i class="bi bi-truck me-1"></i> Active Deliveries
+          </a>
+          <a href="{% url 'home' %}" class="btn btn-outline-light px-3 py-2" style="border-radius: 25px;">
+            <i class="bi bi-house me-1"></i> Home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 1.8rem;">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Delivered Shipments</span>
+            <h3 class="mb-0 text-white fw-bold">{{ total_completed }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(5, 148, 252, 0.15); color: #0594fc; font-size: 1.8rem;">
+            <i class="bi bi-boxes"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Cargo Units Delivered</span>
+            <h3 class="mb-0 text-white fw-bold">{{ total_packages }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 1.8rem;">
+            <i class="bi bi-patch-check-fill"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Delivery Success Rate</span>
+            <h3 class="mb-0 text-white fw-bold">100%</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Deliveries Table -->
+    {% if shipments %}
+      <div class="history-table-container">
+        <div class="p-3 d-flex justify-content-between align-items-center border-bottom" style="border-color: rgba(255,255,255,0.08) !important;">
+          <h5 class="mb-0 text-white fw-bold">
+            <i class="bi bi-journal-check text-success me-2"></i>Completed Consignment Records ({{ total_completed }})
+          </h5>
+          <span class="badge bg-secondary">Archived</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table history-table align-middle">
+            <thead>
+              <tr>
+                <th>Tracking ID</th>
+                <th>Delivered Date</th>
+                <th>Route</th>
+                <th>Recipient / Customer</th>
+                <th>Cargo Details</th>
+                <th>Status</th>
+                <th class="text-end">Verification</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for shipment in shipments %}
+                <tr>
+                  <!-- Tracking ID -->
+                  <td>
+                    <span class="fw-bold font-monospace text-info">
+                      {{ shipment.tracking_id|stringformat:"s"|slice:":8" }}...
+                    </span>
+                    <button class="btn btn-sm btn-link text-white-50 p-0 ms-1" onclick="navigator.clipboard.writeText('{{ shipment.tracking_id }}'); if (window.showTmsToast) { window.showTmsToast('Tracking ID copied: {{ shipment.tracking_id }}', 'success', 4000); } else { alert('Tracking ID copied'); }" title="Copy full ID">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </td>
+
+                  <!-- Delivered Date -->
+                  <td>
+                    <span class="text-white d-block fw-semibold">
+                      {{ shipment.shipment_date|date:"d M Y"|default:shipment.order_date|date:"d M Y" }}
+                    </span>
+                    <small class="text-white-50">Booked: {{ shipment.order_date|date:"d M Y"|default:"-" }}</small>
+                  </td>
+
+                  <!-- Route -->
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-dark border border-secondary text-white-50">
+                        {{ shipment.get_from_destination_display|default:shipment.from_destination }}
+                      </span>
+                      <i class="bi bi-arrow-right text-success"></i>
+                      <span class="badge bg-success-subtle text-success border border-success">
+                        {{ shipment.get_to_destination_display|default:shipment.to_destination }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Recipient -->
+                  <td>
+                    <span class="text-white fw-bold d-block">{{ shipment.customer.customer_name|default:"Direct Consignee" }}</span>
+                    {% if shipment.customer.phone_number %}
+                      <small class="text-white-50">
+                        <i class="bi bi-telephone me-1"></i>{{ shipment.customer.phone_number }}
+                      </small>
+                    {% endif %}
+                  </td>
+
+                  <!-- Cargo -->
+                  <td>
+                    <span class="text-white-50 small d-block">{{ shipment.package_description|default:"General Freight"|truncatechars:30 }}</span>
+                    <span class="badge bg-secondary text-white">{{ shipment.quantity|default:1 }} units</span>
+                  </td>
+
+                  <!-- Status -->
+                  <td>
+                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+                      <i class="bi bi-check-circle-fill me-1"></i> Delivered
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="text-end">
+                    <a href="{% url 'track' %}?tracking_id={{ shipment.tracking_id }}" target="_blank" class="btn-track">
+                      <i class="bi bi-geo-alt"></i> Tracker
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-5 px-4 my-4" style="background: rgba(14, 29, 52, 0.4); border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 20px;">
+        <div class="mb-4">
+          <i class="bi bi-archive text-white-50" style="font-size: 4rem;"></i>
+        </div>
+        <h4 class="text-white fw-bold mb-2">No Past Deliveries On Record</h4>
+        <p class="text-white-50 mx-auto mb-4" style="max-width: 500px;">
+          You haven't marked any deliveries as completed yet. Once you fulfill an active dispatch and change its status to 'Delivered', it will be permanently archived in this log.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{% url 'driver_deliveries' %}" class="btn btn-primary px-4 py-2" style="border-radius: 25px; font-weight: 600;">
+            <i class="bi bi-truck me-1"></i> Go to Active Deliveries
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

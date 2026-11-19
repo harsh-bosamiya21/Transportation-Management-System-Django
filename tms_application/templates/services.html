@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" style="background-image: url('{% static 'images/Designer2.png' %}');">
+      <div class="container position-relative">
+        <h1>Logistics & Freight Services</h1>
+        <p>Comprehensive supply chain solutions: full truckload, intra-city express, flatbed equipment, and specialized bulk transport.</p>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li class="current">Services</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Featured Services Section -->
+    <section id="featured-services" class="featured-services section">
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-4 col-md-6 service-item d-flex">
+            <div class="icon flex-shrink-0"><i class="fa-solid fa-cart-flatbed"></i></div>
+            <div>
+              <h4 class="title">Express Cargo</h4>
+              <p class="description">Agile intra-city transport for light parcels, cartons, and express commerce using Mini Vans and Small Trucks.</p>
+              <a href="{% url 'add_shipment' %}" class="readmore stretched-link"><span>Book Load</span><i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+          <!-- End Service Item -->
+
+          <div class="col-lg-4 col-md-6 service-item d-flex">
+            <div class="icon flex-shrink-0"><i class="fa-solid fa-truck"></i></div>
+            <div>
+              <h4 class="title">Heavy & Flatbed Haul</h4>
+              <p class="description">Open-deck transport engineered for industrial machinery, steel fabrication, construction, and timber payloads up to 10 Tons.</p>
+              <a href="{% url 'add_shipment' %}" class="readmore stretched-link"><span>Book Load</span><i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div><!-- End Service Item -->
+
+          <div class="col-lg-4 col-md-6 service-item d-flex">
+            <div class="icon flex-shrink-0"><i class="fa-solid fa-truck-ramp-box"></i></div>
+            <div>
+              <h4 class="title">Intermodal Containers</h4>
+              <p class="description">Weather-sealed intermodal container trucking ensuring high security for maritime, domestic, and long-haul commercial freight.</p>
+              <a href="{% url 'add_shipment' %}" class="readmore stretched-link"><span>Book Load</span><i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div><!-- End Service Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Featured Services Section -->
+
+    <!-- Services Section -->
+    <section id="services" class="services section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Our Services<br></span>
+        <h2>Logistics Capabilities</h2>
+        <p>End-to-end transportation capabilities designed for reliability, speed, and freight safety.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-1.jpg' %}" alt="Storage & Terminal Services" class="img-fluid">
+              </div>
+              <h3>Terminal Storage</h3>
+              <p>Short-term terminal holding, inventory cross-docking, and secured storage across major metropolitan freight corridors.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-2.jpg' %}" alt="Full Truckload Logistics" class="img-fluid">
+              </div>
+              <h3><a href="{% url 'add_shipment' %}" class="stretched-link">Supply Chain Logistics</a></h3>
+              <p>Streamlined freight workflows connecting consignors, verified drivers, and dispatch hubs with automated allocation.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-3.jpg' %}" alt="Commercial Cargo" class="img-fluid">
+              </div>
+              <h3><a href="{% url 'add_shipment' %}" class="stretched-link">Commercial Cargo</a></h3>
+              <p>Dedicated consignments dispatched with real-time tracking IDs, automated driver assignment, and live milestone updates.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-4.jpg' %}" alt="Highway Trucking" class="img-fluid">
+              </div>
+              <h3><a href="{% url 'add_shipment' %}" class="stretched-link">Highway Trucking</a></h3>
+              <p>Multi-axle trailer trucks and tankers capable of handling 25-ton industrial loads across key Indian inter-state corridors.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-5.jpg' %}" alt="Industrial Packaging" class="img-fluid">
+              </div>
+              <h3>Freight Packaging</h3>
+              <p>Standardized carton packaging, pallet strapping, and protective wrap to safeguard goods throughout highway transit.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-6.jpg' %}" alt="Regional Warehousing" class="img-fluid">
+              </div>
+              <h3><a href="{% url 'add_shipment' %}" class="stretched-link">Regional Warehousing</a></h3>
+              <p>Strategically positioned hubs facilitating fast transfer between long-haul highway trailers and last-mile express vans.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Services Section -->
+
+    <!-- Features Section -->
+    <section id="features" class="features section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Why Choose Us</span>
+        <h2>Key Platform Features</h2>
+        <p>Built with enterprise technology to make transportation seamless, automated, and secure.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4 align-items-center features-item">
+          <div class="col-md-5 d-flex align-items-center">
+            <img src="{% static 'assets/img/features-1.jpg' %}" class="img-fluid rounded-4 shadow" alt="Automated Allocation">
+          </div>
+          <div class="col-md-7">
+            <h3>Automated Driver Matching & Zero Double-Booking</h3>
+            <p class="fst-italic text-info">
+              Eliminate dispatch delays with real-time algorithm matching.
+            </p>
+            <ul>
+              <li><i class="bi bi-check"></i><span> Instant verification of vehicle payload category and commercial license.</span></li>
+              <li><i class="bi bi-check"></i> <span>Automatic booking lock prevents drivers from being double-booked on concurrent dispatches.</span></li>
+              <li><i class="bi bi-check"></i> <span>Automated driver release back to available duty pool upon cargo delivery confirmation.</span></li>
+            </ul>
+          </div>
+        </div><!-- Features Item -->
+
+        <div class="row gy-4 align-items-center features-item">
+          <div class="col-md-5 order-1 order-md-2 d-flex align-items-center">
+            <img src="{% static 'assets/img/features-2.jpg' %}" class="img-fluid rounded-4 shadow" alt="Live Stepper Tracking">
+          </div>
+          <div class="col-md-7 order-2 order-md-1">
+            <h3>5-Stage Live Consignment Stepper Tracking</h3>
+            <p class="fst-italic text-info">
+              Complete delivery visibility from origin warehouse to recipient delivery.
+            </p>
+            <p>
+              Consignors and consignees track packages with zero login required using a 36-character UUID code. Visual progress indicators advance from Processing, Shipped, In Transit, Out for Delivery, through Doorstep Delivery.
+            </p>
+          </div>
+        </div><!-- Features Item -->
+
+      </div>
+
+    </section><!-- /Features Section -->
+
+    <!-- Testimonials Section -->
+<!-- /Faq Section -->
+
+  </main>
+{% endblock %}

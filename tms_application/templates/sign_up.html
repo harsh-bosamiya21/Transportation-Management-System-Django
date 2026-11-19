@@ -1,0 +1,962 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | Transport Management System</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  
+  <!-- External stylesheet with cache buster -->
+  <link rel="stylesheet" href="{% static 'css/Log.css' %}?v=3.1">
+
+  <!-- Embedded CSS to guarantee styles load with 0 cache dependency -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      background-color: #071224;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Background with logistics illustration */
+    .auth-section {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      background-image: 
+        linear-gradient(rgba(7, 18, 38, 0.65), rgba(5, 14, 30, 0.75)),
+        url('{% static "images/login.png" %}');
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 24px 20px 30px;
+    }
+
+    /* Top bar */
+    .auth-topbar {
+      width: 100%;
+      max-width: 1050px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      z-index: 10;
+    }
+
+    .brand-logo-badge {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 7px 16px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .brand-logo-badge:hover {
+      background: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-logo {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .btn-back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: rgba(7, 18, 38, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 40px;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-back-home:hover {
+      background: rgba(5, 148, 252, 0.35);
+      border-color: #0594fc;
+      color: #ffffff;
+      transform: translateX(-3px);
+      box-shadow: 0 6px 22px rgba(5, 148, 252, 0.4);
+    }
+
+    /* Container */
+    .auth-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      flex: 1;
+    }
+
+    /* Card */
+    .auth-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(8, 20, 42, 0.82);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), 0 0 45px rgba(5, 148, 252, 0.2);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 38px 34px 34px;
+      position: relative;
+      overflow: hidden;
+      color: #ffffff;
+      animation: cardSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardSlideUp {
+      from { opacity: 0; transform: translateY(22px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, #0594fc, #00e5ff, #0594fc);
+    }
+
+    /* Header */
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .auth-icon-badge {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      background: linear-gradient(135deg, rgba(5, 148, 252, 0.3) 0%, rgba(13, 110, 253, 0.12) 100%);
+      border: 1.5px solid rgba(5, 148, 252, 0.5);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(5, 148, 252, 0.3);
+    }
+
+    .auth-icon-badge i {
+      font-size: 1.75rem;
+      color: #38bdf8;
+    }
+
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.4px;
+    }
+
+    .auth-subtitle {
+      font-size: 0.92rem;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+
+    /* Alerts */
+    .auth-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+
+    .auth-alert-danger {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    /* Form controls */
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      font-size: 1.15rem;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: color 0.25s ease;
+      z-index: 2;
+    }
+
+    .form-control-custom {
+      width: 100%;
+      height: 48px;
+      padding: 0 44px 0 46px;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-control-custom::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 400;
+    }
+
+    .form-control-custom:hover {
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(2, 6, 23, 0.75);
+    }
+
+    .form-control-custom:focus {
+      background: rgba(2, 6, 23, 0.9);
+      border-color: #0594fc;
+      box-shadow: 0 0 0 4px rgba(5, 148, 252, 0.35);
+    }
+
+    .input-wrapper:focus-within .input-icon {
+      color: #38bdf8;
+    }
+
+    .btn-toggle-password {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 6px;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: color 0.2s ease;
+      z-index: 3;
+    }
+
+    .btn-toggle-password:hover {
+      color: #ffffff;
+    }
+
+    /* Role Selection Grid */
+    .role-section-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .role-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .role-card {
+      position: relative;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .role-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .role-card:hover {
+      background: rgba(2, 6, 23, 0.75);
+      border-color: rgba(5, 148, 252, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .role-card.active {
+      background: rgba(5, 148, 252, 0.22);
+      border-color: #0594fc;
+      box-shadow: 0 4px 20px rgba(5, 148, 252, 0.35);
+    }
+
+    .role-icon {
+      font-size: 1.75rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      transition: all 0.25s ease;
+      display: block;
+    }
+
+    .role-card.active .role-icon {
+      color: #38bdf8;
+      transform: scale(1.08);
+    }
+
+    .role-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    .role-desc {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: block;
+      line-height: 1.3;
+    }
+
+    .role-check-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0594fc;
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .role-card.active .role-check-indicator {
+      display: flex;
+    }
+
+    /* Options */
+    .form-options-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+    }
+
+    .custom-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .custom-checkbox-label input[type="checkbox"] {
+      accent-color: #0594fc;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .custom-checkbox-label:hover {
+      color: #ffffff;
+    }
+
+    /* Button */
+    .btn-auth-submit {
+      width: 100%;
+      height: 50px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0594fc 0%, #0066cc 100%);
+      border: none;
+      color: #ffffff;
+      font-size: 1.02rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 24px rgba(5, 148, 252, 0.4);
+      transition: all 0.25s ease;
+      margin-bottom: 18px;
+    }
+
+    .btn-auth-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(5, 148, 252, 0.55);
+      filter: brightness(1.08);
+    }
+
+    .btn-auth-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Footer switcher */
+    .auth-footer-switcher {
+      text-align: center;
+      font-size: 0.92rem;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 16px;
+    }
+
+    .auth-footer-switcher a {
+      color: #38bdf8;
+      font-weight: 700;
+      text-decoration: none;
+      margin-left: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .auth-footer-switcher a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    /* Bottom info */
+    .auth-bottom-info {
+      margin-top: 22px;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .auth-bottom-info i {
+      color: #10b981;
+    }
+
+    @media (max-width: 576px) {
+      .auth-card {
+        padding: 30px 22px 26px;
+        border-radius: 20px;
+      }
+      .auth-title {
+        font-size: 1.5rem;
+      }
+      .role-selector-grid {
+        gap: 8px;
+      }
+      .role-card {
+        padding: 12px 6px;
+      }
+    }
+
+    /* Universal Floating Toast Pop-up System (Zero Card Layout Shift) */
+    #tmsToastContainer {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 99999999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 440px;
+      width: calc(100% - 48px);
+      pointer-events: none;
+    }
+
+    .tms-toast-popup {
+      pointer-events: auto;
+      position: relative;
+      overflow: hidden;
+      background: rgba(10, 24, 48, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
+      padding: 16px 18px 18px 18px;
+      color: #ffffff;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      animation: tmsSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .tms-toast-popup.tms-toast-hide {
+      animation: tmsSlideOut 0.35s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+
+    @keyframes tmsSlideIn {
+      from { transform: translateX(115%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes tmsSlideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(115%); opacity: 0; }
+    }
+
+    .tms-toast-popup.tms-toast-success {
+      border-left: 4px solid #10b981;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(16, 185, 129, 0.25);
+    }
+    .tms-toast-popup.tms-toast-success .tms-toast-icon { color: #10b981; }
+
+    .tms-toast-popup.tms-toast-error,
+    .tms-toast-popup.tms-toast-danger {
+      border-left: 4px solid #ef4444;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(239, 68, 68, 0.25);
+    }
+    .tms-toast-popup.tms-toast-error .tms-toast-icon,
+    .tms-toast-popup.tms-toast-danger .tms-toast-icon { color: #ef4444; }
+
+    .tms-toast-popup.tms-toast-warning {
+      border-left: 4px solid #f59e0b;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(245, 158, 11, 0.25);
+    }
+    .tms-toast-popup.tms-toast-warning .tms-toast-icon { color: #f59e0b; }
+
+    .tms-toast-popup.tms-toast-info {
+      border-left: 4px solid #0594fc;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(5, 148, 252, 0.25);
+    }
+    .tms-toast-popup.tms-toast-info .tms-toast-icon { color: #0594fc; }
+
+    .tms-toast-icon {
+      font-size: 1.45rem;
+      line-height: 1;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .tms-toast-body {
+      flex-grow: 1;
+      padding-right: 6px;
+    }
+
+    .tms-toast-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 3px;
+      opacity: 0.85;
+    }
+
+    .tms-toast-message {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #f1f5f9;
+      word-break: break-word;
+    }
+
+    .tms-toast-close {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 1.05rem;
+      line-height: 1;
+      padding: 4px 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+    }
+    .tms-toast-close:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .tms-toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .tms-toast-progress-bar {
+      height: 100%;
+      width: 100%;
+      animation: tmsProgressCountdown 4s linear forwards;
+    }
+    .tms-toast-success .tms-toast-progress-bar { background: #10b981; }
+    .tms-toast-error .tms-toast-progress-bar,
+    .tms-toast-danger .tms-toast-progress-bar { background: #ef4444; }
+    .tms-toast-warning .tms-toast-progress-bar { background: #f59e0b; }
+    .tms-toast-info .tms-toast-progress-bar { background: #0594fc; }
+
+    @keyframes tmsProgressCountdown {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Universal Floating Toast Pop-up Container (Zero Layout Shift) -->
+  <div id="tmsToastContainer">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="tms-toast-popup tms-toast-{{ message.tags|default:'info' }}" role="alert">
+          <div class="tms-toast-icon">
+            {% if 'success' in message.tags %}<i class="bi bi-check-circle-fill"></i>
+            {% elif 'error' in message.tags or 'danger' in message.tags %}<i class="bi bi-exclamation-octagon-fill"></i>
+            {% elif 'warning' in message.tags %}<i class="bi bi-exclamation-triangle-fill"></i>
+            {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
+          </div>
+          <div class="tms-toast-body">
+            <div class="tms-toast-title">
+              {% if 'success' in message.tags %}Success{% elif 'error' in message.tags or 'danger' in message.tags %}Notice{% elif 'warning' in message.tags %}Warning{% else %}Notification{% endif %}
+            </div>
+            <div class="tms-toast-message">{{ message }}</div>
+          </div>
+          <button type="button" class="tms-toast-close" onclick="dismissTmsToast(this.closest('.tms-toast-popup'))" aria-label="Close" title="Dismiss notification">
+            <i class="bi bi-x-lg"></i>
+          </button>
+          <div class="tms-toast-progress"><div class="tms-toast-progress-bar"></div></div>
+        </div>
+      {% endfor %}
+    {% elif error %}
+      <div class="tms-toast-popup tms-toast-error" role="alert">
+        <div class="tms-toast-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+        <div class="tms-toast-body">
+          <div class="tms-toast-title">Notice</div>
+          <div class="tms-toast-message">{{ error }}</div>
+        </div>
+        <button type="button" class="tms-toast-close" onclick="dismissTmsToast(this.closest('.tms-toast-popup'))" aria-label="Close" title="Dismiss notification">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="tms-toast-progress"><div class="tms-toast-progress-bar"></div></div>
+      </div>
+    {% endif %}
+  </div>
+
+  <section class="auth-section">
+    <!-- Top Navigation Bar -->
+    <header class="auth-topbar">
+      <a href="{% url 'home' %}" class="brand-logo-badge" title="Transport Management System">
+        <img src="{% static 'images/logo1.png' %}" alt="TMS Logo" class="brand-logo">
+      </a>
+      <a href="{% url 'home' %}" class="btn-back-home">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+    </header>
+
+    <!-- Center Card -->
+    <main class="auth-container">
+      <div class="auth-card">
+        
+        <!-- Header -->
+        <div class="auth-header">
+          <div class="auth-icon-badge">
+            <i class="bi bi-person-plus-fill"></i>
+          </div>
+          <h1 class="auth-title">Create Account</h1>
+          <p class="auth-subtitle">Join TMS to ship cargo or deliver as a fleet driver</p>
+        </div>
+
+        <!-- Form -->
+        <form action="{% url 'sign_up' %}" method="post" autocomplete="on">
+          {% csrf_token %}
+
+          <!-- Username -->
+          <div class="form-group">
+            <label class="form-label" for="id_username">
+              <span>Choose Username</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-person-fill input-icon"></i>
+              <input 
+                type="text" 
+                id="id_username" 
+                name="username" 
+                class="form-control-custom" 
+                placeholder="Enter unique username" 
+                value="{{ username|default:'' }}" 
+                required 
+                autofocus
+              >
+            </div>
+          </div>
+
+          <!-- Email Address -->
+          <div class="form-group">
+            <label class="form-label" for="id_email">
+              <span>Email Address</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-envelope-fill input-icon"></i>
+              <input 
+                type="email" 
+                id="id_email" 
+                name="email" 
+                class="form-control-custom" 
+                placeholder="Enter your email (e.g. user@example.com)" 
+                value="{{ email|default:'' }}" 
+                required
+                autocomplete="email"
+              >
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="id_password">
+              <span>Password</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-lock-fill input-icon"></i>
+              <input 
+                type="password" 
+                id="id_password" 
+                name="password" 
+                class="form-control-custom" 
+                placeholder="Create a strong password" 
+                required
+              >
+              <button 
+                type="button" 
+                class="btn-toggle-password" 
+                id="togglePassword" 
+                title="Show / Hide password"
+                aria-label="Toggle password visibility"
+              >
+                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Role Selection Grid -->
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="role-section-label">Select Your Role</label>
+            <div class="role-selector-grid">
+              
+              <!-- Customer Role Card -->
+              <div class="role-card {% if role == 'customer' or not role %}active{% endif %}" id="cardRoleCustomer" onclick="selectRole('customer')">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="customer" 
+                  id="roleCustomer" 
+                  {% if role == 'customer' or not role %}checked{% endif %}
+                >
+                <div class="role-check-indicator"><i class="bi bi-check-lg"></i></div>
+                <i class="bi bi-box-seam role-icon"></i>
+                <span class="role-name">Customer</span>
+                <span class="role-desc">Book & track cargo</span>
+              </div>
+
+              <!-- Driver Role Card -->
+              <div class="role-card {% if role == 'driver' %}active{% endif %}" id="cardRoleDriver" onclick="selectRole('driver')">
+                <input 
+                  type="radio" 
+                  name="role" 
+                  value="driver" 
+                  id="roleDriver" 
+                  {% if role == 'driver' %}checked{% endif %}
+                >
+                <div class="role-check-indicator"><i class="bi bi-check-lg"></i></div>
+                <i class="bi bi-truck role-icon"></i>
+                <span class="role-name">Fleet Driver</span>
+                <span class="role-desc">Deliver & earn loads</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Terms Checkbox -->
+          <div class="form-options-row">
+            <label class="custom-checkbox-label">
+              <input type="checkbox" name="terms" id="termsCheck" required checked>
+              <span style="font-size: 0.82rem; line-height: 1.3;">I agree to the TMS terms and service policies</span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-auth-submit">
+            <span>Register & Get Started</span>
+            <i class="bi bi-arrow-right-circle-fill"></i>
+          </button>
+
+          <!-- Footer Switcher -->
+          <div class="auth-footer-switcher">
+            <span>Already have an account?</span>
+            <a href="{% url 'login' %}">Log In</a>
+          </div>
+        </form>
+
+      </div>
+    </main>
+
+    <!-- Bottom Security Indicator -->
+    <footer class="auth-bottom-info">
+      <i class="bi bi-shield-check"></i>
+      <span>Protected by 256-bit TLS encrypted transport logistics security</span>
+    </footer>
+  </section>
+
+  <!-- Interactive Scripts -->
+  <script>
+    function selectRole(selectedRole) {
+      const cardCustomer = document.getElementById('cardRoleCustomer');
+      const cardDriver = document.getElementById('cardRoleDriver');
+      const radioCustomer = document.getElementById('roleCustomer');
+      const radioDriver = document.getElementById('roleDriver');
+
+      if (selectedRole === 'customer') {
+        radioCustomer.checked = true;
+        cardCustomer.classList.add('active');
+        cardDriver.classList.remove('active');
+      } else {
+        radioDriver.checked = true;
+        cardDriver.classList.add('active');
+        cardCustomer.classList.remove('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Password toggle
+      const toggleBtn = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('id_password');
+      const toggleIcon = document.getElementById('togglePasswordIcon');
+
+      if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function() {
+          const isPassword = passwordInput.type === 'password';
+          passwordInput.type = isPassword ? 'text' : 'password';
+          toggleIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+      }
+
+      // Auto-dismiss initial toasts in 4s
+      const initialToasts = document.querySelectorAll('.tms-toast-popup');
+      initialToasts.forEach(function(toast) {
+        setTimeout(function() {
+          dismissTmsToast(toast);
+        }, 4000);
+      });
+    });
+
+    // Global dismiss function for TMS floating toast notifications
+    function dismissTmsToast(toastElement) {
+      if (!toastElement || toastElement.dataset.dismissed === 'true') return;
+      toastElement.dataset.dismissed = 'true';
+      toastElement.classList.add('tms-toast-hide');
+      setTimeout(function() {
+        if (toastElement && toastElement.parentNode) {
+          toastElement.parentNode.removeChild(toastElement);
+        }
+      }, 350);
+    }
+
+    // Global programmatic toast function
+    window.showTmsToast = function(message, type, duration) {
+      type = type || 'info';
+      duration = duration !== undefined ? duration : 4000;
+      let container = document.getElementById('tmsToastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'tmsToastContainer';
+        document.body.appendChild(container);
+      }
+      
+      const iconClass = type === 'success' ? 'bi-check-circle-fill' :
+                        (type === 'error' || type === 'danger') ? 'bi-exclamation-octagon-fill' :
+                        type === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill';
+      
+      const titleText = type === 'success' ? 'Success' :
+                        (type === 'error' || type === 'danger') ? 'Notice' :
+                        type === 'warning' ? 'Warning' : 'Notification';
+
+      const toast = document.createElement('div');
+      toast.className = `tms-toast-popup tms-toast-${type}`;
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = `
+        <div class="tms-toast-icon"><i class="bi ${iconClass}"></i></div>
+        <div class="tms-toast-body">
+          <div class="tms-toast-title">${titleText}</div>
+          <div class="tms-toast-message">${message}</div>
+        </div>
+        <button type="button" class="tms-toast-close" aria-label="Close" title="Dismiss notification">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="tms-toast-progress"><div class="tms-toast-progress-bar"></div></div>
+      `;
+
+      toast.querySelector('.tms-toast-close').addEventListener('click', function() {
+        dismissTmsToast(toast);
+      });
+
+      container.appendChild(toast);
+
+      if (duration > 0) {
+        setTimeout(function() {
+          dismissTmsToast(toast);
+        }, duration);
+      }
+    };
+  </script>
+</body>
+</html>

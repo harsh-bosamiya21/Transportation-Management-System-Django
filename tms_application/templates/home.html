@@ -1,0 +1,616 @@
+
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+{% if role == 'customer' or role == 'driver' or role == 'admin' %}
+
+<style>
+.booking .index-content{
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  color: #fff;
+}
+
+.booking .index-content h1{
+  font-size: 50px;
+  margin-top: 80px;
+}
+.booking .index-content p{
+  margin: 20px auto;
+  font-weight: 100; 
+  line-height: 25px;
+}
+
+.booking .index-content .mybutton{
+  width: 200px;
+  padding: 15px 0;
+  text-align: center;
+  margin: 20px 10px;
+  border-radius: 25px;
+  font-weight: bold;
+  border: 2px solid #0594fc;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.booking .index-content .mybutton a{
+  color: #fff;
+  text-decoration: none;
+}
+
+.booking .index-span{
+  background: #0594fc;
+  height: 100%;
+  width: 0;
+  border-radius: 25px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  transition: 0.5s;
+}
+
+
+
+.booking .mybutton:hover span{
+  width: 100%;
+}
+
+</style>
+
+  <main class="main bg-dark">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+
+      <img src="{% static 'assets/img/world-dotted-map.png' %}" alt="" class="hero-bg">
+
+      <div class="container">
+        <div class="row gy-4 d-flex justify-content-between">
+          <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+            <h2>Your Lightning Fast Delivery Partner</h2>
+            <p>Simplify your transportation needs with our all-in-one solution. Our platform offers seamless management of shipments, drivers, and trucks, ensuring efficiency and reliability every step of the way. Whether you're booking shipments, tracking deliveries, we provide tools to streamline your logistics operations.</p>
+
+            <div class="row gy-4">
+
+              <div class="col-lg-3 col-6">
+                <div class="stats-item text-center w-100 h-100">
+                  <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="0" class="purecounter">232</span>
+                  <p>Clients</p>
+                </div>
+              </div><!-- End Stats Item -->
+
+
+              <div class="col-lg-3 col-6">
+                <div class="stats-item text-center w-100 h-100">
+                  <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="0" class="purecounter">1453</span>
+                  <p>Support</p>
+                </div>
+              </div><!-- End Stats Item -->
+
+              <div class="col-lg-3 col-6">
+                <div class="stats-item text-center w-100 h-100">
+                  <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="0" class="purecounter">32</span>
+                  <p>Workers</p>
+                </div>
+              </div><!-- End Stats Item -->
+
+            </div>
+
+          </div>
+
+          <div class="col-lg-5 order-1 order-lg-2 hero-img">
+            <img src="{% static 'assets/img/hero-img.svg' %}" class="img-fluid mb-3 mb-lg-0" alt="">
+          </div>
+
+        </div>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+
+    <!-- Booking section -->
+
+    <!-- Services Section -->
+    <section id="booking" class="booking section" style="background-color: #001f4d;">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span style="z-index: 10000; color: color-mix(in srgb, #ffffff, transparent 95%);">{% if role == 'admin' %}Central Command{% elif role == 'driver' or user.is_driver %}Driver Portal{% else %}Customer Services{% endif %}<br></span>
+        <h2 style="color: #ffffff;">{% if role == 'admin' %}Administrator Operations Center{% elif role == 'driver' or user.is_driver %}Driver Operations Console{% else %}Customer Dashboard & Services{% endif %}</h2>
+      </div><!-- End Section Title -->
+      
+      {% if role == 'driver' or user.is_driver %}
+      <main class="container">
+          <div class="bg-body-tertiary p-5 rounded mt-3">
+              <h1><i class="bi bi-truck text-primary me-2"></i>Assigned Deliveries</h1>
+              <p class="text-white-50">View active shipments assigned to your truck, start deliveries, and update dispatch status.</p>
+              <a href="{% url 'driver_deliveries' %}"><button type="button" class="btn btn-primary btn-lg"><i class="bi bi-truck me-1"></i> Manage Active Deliveries &raquo;</button></a> 
+          </div>
+      </main>
+      <main class="container">
+          <div class="bg-body-tertiary p-5 rounded mt-3">
+              <h1><i class="bi bi-clock-history text-info me-2"></i>Delivery History</h1>
+              <p class="text-white-50">Review all previously completed and delivered cargo consignments.</p>
+              <a href="{% url 'driver_history' %}"><button type="button" class="btn btn-info text-white btn-lg"><i class="bi bi-clock-history me-1"></i> View Past Deliveries &raquo;</button></a> 
+          </div>
+      </main>
+      <main class="container">
+          <div class="bg-body-tertiary p-5 rounded mt-3">
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                <h1 class="mb-0"><i class="bi bi-person-gear text-secondary me-2"></i>Driver Fleet Profile</h1>
+                {% if not driver_profile %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                    <i class="bi bi-x-circle-fill me-1"></i> Fleet Not Added (Empty)
+                  </span>
+                {% elif is_fleet_complete %}
+                  <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                    <i class="bi bi-patch-check-fill me-1"></i> Fleet Verified & Eligible
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Fleet Incomplete
+                  </span>
+                {% endif %}
+              </div>
+
+              {% if not driver_profile %}
+                <!-- Empty Fleet State -->
+                <div class="p-4 mb-3 rounded-3" style="background: rgba(245, 158, 11, 0.12); border: 1.5px dashed #f59e0b;">
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                    <div class="p-3 rounded-circle text-warning text-center" style="background: rgba(245, 158, 11, 0.25); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <i class="bi bi-truck-flatbed fs-2 text-warning"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-dark fw-bold mb-1">No Fleet Vehicle Registered</h5>
+                      <p class="text-secondary mb-0" style="font-size: 0.95rem; color: #475569 !important;">
+                        Your fleet profile is currently empty. You must register your truck type, license plate number, registration number, and commercial driver's license to be counted and receive automated delivery consignments.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <a href="{% url 'add_driver' %}">
+                  <button type="button" class="btn btn-warning text-dark btn-lg fw-bold shadow-sm px-4 py-2" style="border-radius: 12px;">
+                    <i class="bi bi-plus-circle-fill me-2"></i> Add Fleet Details &raquo;
+                  </button>
+                </a>
+
+              {% elif is_fleet_complete %}
+                <!-- Complete Fleet Details Display -->
+                <p class="text-secondary mb-3" style="color: #475569 !important;">
+                  Your fleet vehicle is fully configured and verified. You are active on duty and eligible for automated shipment dispatches.
+                </p>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1"><i class="bi bi-truck me-1"></i> Vehicle Type</small>
+                      <strong class="text-dark">{{ driver_profile.get_vehicle_type_display|default:driver_profile.vehicle_type }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1"><i class="bi bi-card-text me-1"></i> Plate Number</small>
+                      <strong class="text-dark">{{ driver_profile.vehicle_number_plate }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1"><i class="bi bi-file-earmark-text me-1"></i> Registration No</small>
+                      <strong class="text-dark">{{ driver_profile.vehicle_registration_number }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1"><i class="bi bi-person-vcard me-1"></i> License No</small>
+                      <strong class="text-dark">{{ driver_profile.license_number }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <a href="{% url 'add_driver' %}">
+                  <button type="button" class="btn btn-outline-dark btn-lg">
+                    <i class="bi bi-pencil-square me-2"></i> Update Fleet Settings &raquo;
+                  </button>
+                </a>
+
+              {% else %}
+                <!-- Partially Incomplete Fleet Details -->
+                <div class="p-4 mb-3 rounded-3" style="background: rgba(245, 158, 11, 0.12); border: 1.5px dashed #f59e0b;">
+                  <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                    <div class="p-3 rounded-circle text-warning text-center" style="background: rgba(245, 158, 11, 0.25); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <i class="bi bi-exclamation-triangle-fill fs-2 text-warning"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-dark fw-bold mb-1">Fleet Setup Incomplete</h5>
+                      <p class="text-secondary mb-0" style="font-size: 0.95rem; color: #475569 !important;">
+                        Some mandatory fleet details are missing. You must provide vehicle classification, registration number, number plate, and commercial driver's license to activate dispatch eligibility.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1">Vehicle Type</small>
+                      <strong class="{% if driver_profile.vehicle_type %}text-dark{% else %}text-danger{% endif %}">
+                        {{ driver_profile.get_vehicle_type_display|default:driver_profile.vehicle_type|default:"Missing" }}
+                      </strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1">Plate Number</small>
+                      <strong class="{% if driver_profile.vehicle_number_plate %}text-dark{% else %}text-danger{% endif %}">
+                        {{ driver_profile.vehicle_number_plate|default:"Missing" }}
+                      </strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1">Registration No</small>
+                      <strong class="{% if driver_profile.vehicle_registration_number %}text-dark{% else %}text-danger{% endif %}">
+                        {{ driver_profile.vehicle_registration_number|default:"Missing" }}
+                      </strong>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-6">
+                    <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                      <small class="text-muted d-block mb-1">License No</small>
+                      <strong class="{% if driver_profile.license_number %}text-dark{% else %}text-danger{% endif %}">
+                        {{ driver_profile.license_number|default:"Missing" }}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+                <a href="{% url 'add_driver' %}">
+                  <button type="button" class="btn btn-warning text-dark btn-lg fw-bold shadow-sm px-4 py-2" style="border-radius: 12px;">
+                    <i class="bi bi-pencil-fill me-2"></i> Complete Fleet Details Now &raquo;
+                  </button>
+                </a>
+              {% endif %}
+          </div>
+      </main>
+      {% endif %}
+
+
+      {% if role == 'customer' %}
+      <main class="container">
+        <div class="bg-body-tertiary p-5 rounded mt-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-2">
+              <h1 class="mb-0"><i class="bi bi-person-lines-fill text-primary me-2"></i>Customer Profile Details</h1>
+              {% if is_customer_profile_complete %}
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                  <i class="bi bi-patch-check-fill me-1"></i> Profile Verified & Saved
+                </span>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill" style="font-size: 0.9rem;">
+                  <i class="bi bi-exclamation-triangle-fill me-1"></i> Address Incomplete (Setup Needed)
+                </span>
+              {% endif %}
+            </div>
+            <p class="text-white-50">
+              {% if is_customer_profile_complete %}
+                Your state, city, and delivery address details are saved ({% if customer_profile.city %}{{ customer_profile.city }}, {{ customer_profile.state }}{% endif %}). Ready for automated parcel dispatch.
+              {% else %}
+                Set up your state, city, and street address details so your consignments can be automatically dispatched to you.
+              {% endif %}
+            </p>
+            <a href="{% url 'add_customer' %}"><button type="button" class="btn btn-primary btn-lg"><i class="bi bi-pencil-square me-1"></i> {% if is_customer_profile_complete %}Update Profile Details &raquo;{% else %}Complete Profile Details &raquo;{% endif %}</button></a> 
+        </div>
+    </main>
+
+    <main class="container">
+        <div class="bg-body-tertiary p-5 rounded mt-3">
+            <h1><i class="bi bi-box-seam-fill text-success me-2"></i>Book New Shipment</h1>
+            <p class="text-white-50">Schedule a new cargo consignment with auto-assigned eligible drivers, live origin/destination routes, and parcel specifications.</p>
+            <a href="{% url 'add_shipment' %}"><button type="button" class="btn btn-success text-white btn-lg"><i class="bi bi-plus-circle-fill me-1"></i> Book New Shipment &raquo;</button></a> 
+        </div>
+    </main>
+
+    <main class="container">
+        <div class="bg-body-tertiary p-5 rounded mt-3">
+            <h1><i class="bi bi-geo-alt-fill text-info me-2"></i>Track Live Shipment</h1>
+            <p class="text-white-50">Enter your unique consignment tracking ID to monitor real-time milestone progress, current location, and estimated delivery dates.</p>
+            <a href="{% url 'track' %}"><button type="button" class="btn btn-info text-white btn-lg"><i class="bi bi-radar me-1"></i> Track Live Package &raquo;</button></a> 
+        </div>
+    </main>
+
+    <main class="container">
+        <div class="bg-body-tertiary p-5 rounded mt-3">
+            <h1><i class="bi bi-clock-history text-warning me-2"></i>My Order History</h1>
+            <p class="text-white-50">Review all your previous and active cargo orders, assigned driver details, package quantities, and transit receipts.</p>
+            <a href="{% url 'order_history' %}"><button type="button" class="btn btn-warning text-dark btn-lg"><i class="bi bi-receipt me-1"></i> View Order History &raquo;</button></a> 
+        </div>
+    </main>
+    {% endif %}
+
+    {% if role == 'admin' %}
+    <!-- Admin Overview Stats & Controls -->
+    <main class="container">
+      <div class="bg-body-tertiary p-4 p-md-5 rounded mt-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+          <div>
+            <h1 class="mb-1"><i class="bi bi-shield-check text-danger me-2"></i>System Administration Dashboard</h1>
+            <p class="text-white-50 mb-0">Platform overview, active shipments, fleet operations, and user management.</p>
+          </div>
+          <a href="/admin/" class="btn btn-danger btn-lg px-4" style="border-radius: 12px; font-weight: 600;">
+            <i class="bi bi-speedometer2 me-2"></i> Open Django Admin Panel &raquo;
+          </a>
+        </div>
+
+        <div class="row g-3 mb-2">
+          <div class="col-md-3 col-6">
+            <div class="p-3 rounded-3" style="background: rgba(5, 148, 252, 0.15); border: 1px solid rgba(5, 148, 252, 0.35);">
+              <small class="text-white-50 d-block mb-1"><i class="bi bi-people me-1"></i> Total Users</small>
+              <h3 class="text-white fw-bold mb-0">{{ admin_stats.total_users }}</h3>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-3 rounded-3" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">
+              <small class="text-white-50 d-block mb-1"><i class="bi bi-person-lines-fill me-1"></i> Customers</small>
+              <h3 class="text-white fw-bold mb-0">{{ admin_stats.total_customers }}</h3>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-3 rounded-3" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">
+              <small class="text-white-50 d-block mb-1"><i class="bi bi-truck me-1"></i> Fleet Drivers</small>
+              <h3 class="text-white fw-bold mb-0">{{ admin_stats.total_drivers }} <span style="font-size: 0.85rem; font-weight: normal; color: #fbbf24;">({{ admin_stats.active_drivers }} Available)</span></h3>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="p-3 rounded-3" style="background: rgba(147, 51, 234, 0.15); border: 1px solid rgba(147, 51, 234, 0.35);">
+              <small class="text-white-50 d-block mb-1"><i class="bi bi-box-seam me-1"></i> Total Shipments</small>
+              <h3 class="text-white fw-bold mb-0">{{ admin_stats.total_shipments }} <span style="font-size: 0.85rem; font-weight: normal; color: #c084fc;">({{ admin_stats.active_shipments }} Active)</span></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <main class="container">
+      <div class="bg-body-tertiary p-5 rounded mt-3">
+        <h1><i class="bi bi-box-seam text-primary me-2"></i>Shipments Directory</h1>
+        <p class="text-white-50">Review, update, and manage all consignments, assigned drivers, customer destinations, and cargo statuses across the system.</p>
+        <a href="/admin/tms_application/newshipment/"><button type="button" class="btn btn-primary text-white btn-lg"><i class="bi bi-table me-1"></i> Manage All Shipments &raquo;</button></a>
+      </div>
+    </main>
+
+    <main class="container">
+      <div class="bg-body-tertiary p-5 rounded mt-3">
+        <h1><i class="bi bi-truck text-warning me-2"></i>Fleet Drivers Management</h1>
+        <p class="text-white-50">Verify commercial driver licenses, vehicle registration cards, truck categories, and real-time on-duty availability status.</p>
+        <a href="/admin/tms_application/newdriver/"><button type="button" class="btn btn-warning text-dark btn-lg"><i class="bi bi-gear-fill me-1"></i> Manage Fleet Drivers &raquo;</button></a>
+      </div>
+    </main>
+
+    <main class="container">
+      <div class="bg-body-tertiary p-5 rounded mt-3">
+        <h1><i class="bi bi-radar text-info me-2"></i>Public Consignment Tracker</h1>
+        <p class="text-white-50">Look up any shipment across the platform using its 36-character UUID tracking code and inspect the milestone timeline.</p>
+        <a href="{% url 'track' %}"><button type="button" class="btn btn-info text-white btn-lg"><i class="bi bi-search me-1"></i> Track Any Shipment &raquo;</button></a>
+      </div>
+    </main>
+    {% endif %}
+
+
+    </section><!-- /Booking section -->
+
+
+    <!-- Featured Services Section -->
+    <!-- /Featured Services Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-6 position-relative align-self-start order-lg-last order-first">
+            <img src="{% static 'assets/img/about.jpg' %}" class="img-fluid" alt="">
+            <a href="" class="glightbox pulsating-play-btn"></a>
+          </div>
+
+          <div class="col-lg-6 content order-last  order-lg-first">
+            <h3>About Us</h3>
+            <p>
+              We are committed to revolutionizing logistics and transportation management. With a focus on efficiency and reliability, our platform empowers businesses to streamline operations, enhance productivity, and deliver exceptional services.
+            </p>
+            <ul>
+              <li>
+                <i class="bi bi-diagram-3"></i>
+                <div>
+                  <h5>Simplified Logistics Management</h5>
+                  <p>Seamlessly manage shipments, trucks, and drivers to ensure smooth transportation operations.</p>
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-fullscreen-exit"></i>
+                <div>
+                  <h5>Customized Solutions for Your Needs</h5>
+                  <p>Tailored tools and services designed to fit diverse logistics requirements effectively.</p>
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-broadcast"></i>
+                <div>
+                  <h5>Committed to Excellence</h5>
+                  <p>Dedicated to delivering solutions that ensure timely deliveries and customer satisfaction.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Services Section -->
+    <section id="services" class="services section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Our Services<br></span>
+        <h2>Our ServiceS</h2>
+        <p>We provide comprehensive solutions tailored to meet your logistics and transportation needs.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-2.jpg' %}" alt="" class="img-fluid">
+              </div>
+              <h3><a href="#" class="stretched-link">Logistics</a></h3>
+              <p>Efficiently manage your supply chain with our advanced tools and services to streamline operations.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-3.jpg' %}" alt="" class="img-fluid">
+              </div>
+              <h3><a href="#" class="stretched-link">Cargo</a></h3>
+              <p>Secure and reliable transportation of goods, ensuring timely deliveries and customer satisfaction.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+          <div class="col-lg-4 col-md-6">
+            <div class="card">
+              <div class="card-img">
+                <img src="{% static 'assets/img/service-4.jpg' %}" alt="" class="img-fluid">
+              </div>
+              <h3><a href="#" class="stretched-link">Trucking</a></h3>
+              <p>Professional trucking services designed to handle shipments of any size or type with utmost care and efficiency.</p>
+            </div>
+          </div><!-- End Card Item -->
+
+
+
+        </div>
+
+      </div>
+
+    </section><!-- /Services Section -->
+
+    <!-- Call To Action Section -->
+    <!-- /Call To Action Section -->
+
+    <!-- Features Section -->
+
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Pricing</span>
+        <h2>Pricing</h2>
+        <p>Explore our flexible plans to suit your transportation needs.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-4">
+            <div class="pricing-item">
+              <h3>Free Plan</h3>
+              <h4><sup>$</sup>0<span> / month</span></h4>
+              <ul>
+                <li><i class="bi bi-check"></i> <span>Basic access to essential features.</span></li>
+                <li><i class="bi bi-check"></i> <span>Includes simple shipment tracking.</span></li>
+                <li><i class="bi bi-check"></i> <span>Suitable for small-scale operations.</span></li>
+                <li><i class="bi bi-check"></i> <span>Limited advanced functionalities.</span></li>
+              </ul>
+              <a href="#" class="buy-btn">Buy Now</a>
+            </div>
+          </div><!-- End Pricing Item -->
+
+          <div class="col-lg-4">
+            <div class="pricing-item featured">
+              <h3>Business Plan</h3>
+              <h4><sup>$</sup>29<span> / month</span></h4>
+              <ul>
+                <li><i class="bi bi-check"></i> <span>Ideal for growing businesses.</span></li>
+                <li><i class="bi bi-check"></i> <span>Advanced shipment management tools.</span></li>
+                <li><i class="bi bi-check"></i> <span>Detailed analytics and reporting.</span></li>
+                <li><i class="bi bi-check"></i> <span>Enhanced customer support.</span></li>
+              </ul>
+              <a href="#" class="buy-btn">Buy Now</a>
+            </div>
+          </div><!-- End Pricing Item -->
+
+          <div class="col-lg-4">
+            <div class="pricing-item">
+              <h3>Developer Plan</h3>
+              <h4><sup>$</sup>49<span> / month</span></h4>
+              <ul>
+                <li><i class="bi bi-check"></i> <span>Complete access to all features.</span></li>
+                <li><i class="bi bi-check"></i> <span>Advanced integration capabilities.</span></li>
+                <li><i class="bi bi-check"></i> <span>Optimized tools for large-scale operations.</span></li>
+                <li><i class="bi bi-check"></i> <span>Priority customer support.</span></li>
+              </ul>
+              <a href="#" class="buy-btn">Buy Now</a>
+            </div>
+          </div><!-- End Pricing Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Pricing Section -->
+
+    <!-- Testimonials Section -->
+<!-- /Testimonials Section -->
+
+    <!-- Faq Section -->
+<!-- /Faq Section -->
+
+  </main>
+
+
+{% else %}
+<div class="banner d-flex align-items-center justify-content-center" style="position: relative; padding-top: 100px;">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-5 text-center">
+        <div class="card p-4 p-md-5 shadow-lg border-0" style="background: rgba(14, 29, 52, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #ffffff; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+          <div class="card-body">
+            <i class="bi bi-shield-lock" style="font-size: 3.5rem; color: #0594fc;"></i>
+            <h2 class="mt-3 mb-2" style="font-weight: 700; color: #ffffff; font-size: 1.8rem;">Authentication Required</h2>
+            {% if user.is_authenticated %}
+              <p class="text-white-50 mb-4">You are logged in as <strong>{{ user.username }}</strong>, but do not have a customer or driver profile assigned.</p>
+              <div class="d-grid gap-2">
+                <a href="#" class="btn btn-primary btn-lg" onclick="confirmLogout(); return false;" style="border-radius: 25px; background: #0594fc; border-color: #0594fc; font-weight: 600;">Switch Account / Logout</a>
+              </div>
+            {% else %}
+              <p class="text-white-50 mb-4">Please log in to your account to view your dashboard and manage shipments.</p>
+              <div class="d-grid gap-3">
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg" style="border-radius: 25px; background: #0594fc; border-color: #0594fc; font-weight: 600;">Log In</a>
+                <a href="{% url 'sign_up' %}" class="btn btn-outline-light btn-lg" style="border-radius: 25px; font-weight: 600;">Create an Account</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" style="background-image: url('{% static 'images/Designer2.png' %}');">
+      <div class="container position-relative">
+        <h1>About Us</h1>
+        <p>Empowering nationwide freight logistics with intelligent fleet allocation, real-time tracking, and verified commercial carriers.</p>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li class="current">About</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-6 position-relative align-self-start order-lg-last order-first">
+            <img src="{% static 'assets/img/about.jpg' %}" class="img-fluid rounded-4 shadow" alt="About TMS">
+          </div>
+
+          <div class="col-lg-6 content order-last order-lg-first">
+            <h3>Pioneering Modern Freight Logistics</h3>
+            <p>
+              Transport Management System (TMS) bridges the gap between commercial consignors and professional fleet drivers across India. Our technology-driven platform automates consignment dispatching, manages verified fleets across 6 vehicle classifications, and ensures seamless cargo transit with end-to-end transparency.
+            </p>
+            <ul>
+              <li>
+                <i class="bi bi-diagram-3"></i>
+                <div>
+                  <h5>Automated Vehicle & Driver Matching</h5>
+                  <p>Intelligent dispatch engine automatically matches consignments to verified on-duty drivers based on cargo capacity and truck specifications.</p>
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-shield-check"></i>
+                <div>
+                  <h5>Verified Fleet & Equipment Standards</h5>
+                  <p>Every commercial driver is verified with verified driver licenses (DL), vehicle RC registration, and standardized payload classifications.</p>
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-geo-alt"></i>
+                <div>
+                  <h5>End-to-End Milestone Tracking</h5>
+                  <p>Zero-login 5-stage milestone tracking enables customers and recipients to monitor consignments from processing to doorstep delivery.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats section">
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="232" data-purecounter-duration="1" class="purecounter">232</span>
+              <p>Clients</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="521" data-purecounter-duration="1" class="purecounter">521</span>
+              <p>Projects</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="1453" data-purecounter-duration="1" class="purecounter">1435</span>
+              <p>Hours Of Support</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-item text-center w-100 h-100">
+              <span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1" class="purecounter">32</span>
+              <p>Workers</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Stats Section -->
+
+    <!-- Team Section -->
+    <section id="team" class="team section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Leadership<br></span>
+        <h2>Operations Leadership</h2>
+        <p>Dedicated logistics veterans leading our operations, fleet engineering, and safety compliance.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row">
+
+          <div class="col-lg-4 col-md-6 d-flex">
+            <div class="member">
+              <img src="{% static 'assets/img/team/team-1.jpg' %}" class="img-fluid" alt="Director of Operations">
+              <div class="member-content">
+                <h4>Rajesh Sharma</h4>
+                <span>Director of Fleet Operations</span>
+                <p>
+                  Over 15 years overseeing nationwide highway dispatch corridors, fleet reliability, and carrier network operations.
+                </p>
+                <div class="social">
+                  <a href=""><i class="bi bi-twitter-x"></i></a>
+                  <a href=""><i class="bi bi-facebook"></i></a>
+                  <a href=""><i class="bi bi-instagram"></i></a>
+                  <a href=""><i class="bi bi-linkedin"></i></a>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Team Member -->
+
+          <div class="col-lg-4 col-md-6 d-flex">
+            <div class="member">
+              <img src="{% static 'assets/img/team/team-2.jpg' %}" class="img-fluid" alt="Head of Supply Chain">
+              <div class="member-content">
+                <h4>Pooja Patel</h4>
+                <span>Head of Supply Chain & Routing</span>
+                <p>
+                  Specializes in route optimization, multi-city terminal management, and automated consignor allocation.
+                </p>
+                <div class="social">
+                  <a href=""><i class="bi bi-twitter-x"></i></a>
+                  <a href=""><i class="bi bi-facebook"></i></a>
+                  <a href=""><i class="bi bi-instagram"></i></a>
+                  <a href=""><i class="bi bi-linkedin"></i></a>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Team Member -->
+
+          <div class="col-lg-4 col-md-6 d-flex">
+            <div class="member">
+              <img src="{% static 'assets/img/team/team-3.jpg' %}" class="img-fluid" alt="Safety & Compliance">
+              <div class="member-content">
+                <h4>Vikram Mehta</h4>
+                <span>Head of Safety & Compliance</span>
+                <p>
+                  Ensures comprehensive driver credentialing, vehicle RC verification, and transit safety protocols.
+                </p>
+                <div class="social">
+                  <a href=""><i class="bi bi-twitter-x"></i></a>
+                  <a href=""><i class="bi bi-facebook"></i></a>
+                  <a href=""><i class="bi bi-instagram"></i></a>
+                  <a href=""><i class="bi bi-linkedin"></i></a>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Team Member -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Team Section -->
+
+    <!-- Testimonials Section -->
+  <!-- /Faq Section -->
+
+  </main>
+{% endblock %}

@@ -1,0 +1,564 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+.driver-page-wrapper {
+  background-color: #0b1528;
+  min-height: 100vh;
+  padding-top: 170px;
+  padding-bottom: 80px;
+  color: #e2e8f0;
+}
+
+.driver-header {
+  background: linear-gradient(135deg, rgba(14, 29, 52, 0.95), rgba(7, 18, 38, 0.95));
+  border: 1px solid rgba(5, 148, 252, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.driver-profile-pill {
+  background: rgba(5, 148, 252, 0.12);
+  border: 1px solid rgba(5, 148, 252, 0.3);
+  border-radius: 50px;
+  padding: 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-card {
+  background: rgba(14, 29, 52, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px 22px;
+  transition: all 0.25s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(5, 148, 252, 0.4);
+  box-shadow: 0 8px 25px rgba(5, 148, 252, 0.15);
+}
+
+.delivery-card {
+  background: linear-gradient(180deg, rgba(17, 34, 64, 0.9) 0%, rgba(11, 23, 44, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+}
+
+.delivery-card:hover {
+  border-color: rgba(5, 148, 252, 0.5);
+  transform: translateY(-2px);
+}
+
+.delivery-card-header {
+  background: rgba(7, 16, 32, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 24px;
+}
+
+.route-container {
+  background: rgba(5, 148, 252, 0.05);
+  border: 1px dashed rgba(5, 148, 252, 0.25);
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+
+.route-point {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-processing {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.status-shipped {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.status-in_transit {
+  background: rgba(14, 165, 233, 0.25);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.6);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.3);
+}
+
+.status-out_for_delivery {
+  background: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+}
+
+.action-bar {
+  background: rgba(10, 20, 38, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 24px;
+}
+
+.btn-start-trip {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #111827;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-start-trip:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  transform: translateY(-2px);
+  color: #000;
+}
+
+.btn-complete-trip {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  transition: all 0.2s ease;
+}
+
+.btn-complete-trip:hover {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  transform: translateY(-2px);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-transit {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+}
+
+.btn-transit:hover {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: #fff;
+}
+</style>
+
+<main class="main driver-page-wrapper">
+  <div class="container">
+
+    <!-- Top Dispatch Console Header -->
+    <div class="driver-header p-4 mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary text-white text-uppercase px-3 py-1" style="font-size: 0.75rem; letter-spacing: 1px;">
+              <i class="bi bi-shield-check me-1"></i> Driver Dispatch Console
+            </span>
+            <span class="text-success small fw-bold">
+              <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i> Live Portal
+            </span>
+          </div>
+          <h1 class="display-6 fw-bold mb-1 text-white">
+            <i class="bi bi-truck text-primary me-2"></i>Assigned Deliveries
+          </h1>
+          <p class="text-white-50 mb-0">
+            View active dispatches, start delivery routes, and update shipment status directly from this console.
+          </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'driver_history' %}" class="btn btn-outline-info px-4 py-2" style="border-radius: 25px; font-weight: 600;">
+            <i class="bi bi-clock-history me-1"></i> Delivery History
+          </a>
+          {% if not driver %}
+          <a href="{% url 'add_driver' %}" class="btn btn-warning text-dark fw-bold px-3 py-2" style="border-radius: 25px;">
+            <i class="bi bi-plus-circle-fill me-1"></i> Add Fleet Details
+          </a>
+          {% else %}
+          <a href="{% url 'add_driver' %}" class="btn btn-outline-secondary px-3 py-2 text-white" style="border-radius: 25px;">
+            <i class="bi bi-gear-fill me-1"></i> Fleet Profile
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if driver %}
+      <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 20px 0 16px 0;">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 text-white-50 small">
+        <div class="driver-profile-pill">
+          <i class="bi bi-person-badge-fill text-primary" style="font-size: 1.1rem;"></i>
+          <span>Driver: <strong class="text-white">{{ driver.driver_name }}</strong></span>
+          <span class="text-secondary">|</span>
+          <span>Vehicle Plate: <strong class="text-white">{{ driver.vehicle_number_plate|default:driver.vehicle_registration_number }}</strong></span>
+          <span class="text-secondary">|</span>
+          <span>Phone: <strong class="text-white">{{ driver.phone_number }}</strong></span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          {% if is_fleet_complete %}
+            <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+              <i class="bi bi-patch-check-fill me-1"></i> Fleet Verified & Eligible
+            </span>
+          {% else %}
+            <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill">
+              <i class="bi bi-exclamation-circle me-1"></i> Fleet Setup Incomplete
+            </span>
+          {% endif %}
+          {% if total_active > 0 %}
+            <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2 rounded-pill" title="Currently booked with active delivery consignments">
+              <i class="bi bi-truck me-1"></i> Booked on Dispatch ({{ total_active }} Active Job{{ total_active|pluralize }})
+            </span>
+          {% else %}
+            <span class="badge {% if driver.available %}bg-info-subtle text-info border border-info{% else %}bg-secondary-subtle text-secondary border border-secondary{% endif %} px-3 py-2 rounded-pill">
+              <i class="bi bi-broadcast me-1"></i> {% if driver.available %}Available for Loads{% else %}Off Duty{% endif %}
+            </span>
+            {% if is_fleet_complete %}
+              <a href="{% url 'toggle_driver_duty' %}" class="btn btn-sm {% if driver.available %}btn-outline-light{% else %}btn-success text-white fw-bold{% endif %} px-3 py-1" style="border-radius: 20px; font-size: 0.82rem; text-decoration: none;" title="Toggle duty status">
+                {% if driver.available %}
+                  <i class="bi bi-pause-circle me-1"></i> Go Off Duty
+                {% else %}
+                  <i class="bi bi-play-circle-fill me-1"></i> Go On Duty (Available)
+                {% endif %}
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Incomplete Fleet Alert Warning -->
+    {% if not is_fleet_complete %}
+    <div class="alert alert-warning d-flex flex-column flex-md-row align-items-md-center justify-content-between p-3 mb-4 gap-3" 
+         style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px;">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-2 rounded-circle" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 1.4rem;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <strong class="text-white d-block">Fleet Details Incomplete &bull; Not Eligible for Shipment Assignments</strong>
+          <span class="small text-white-50">You must completely register your vehicle type, registration number, number plate, and commercial license to be counted and assigned shipments.</span>
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'add_driver' %}" class="btn btn-warning btn-sm fw-bold px-3 py-2" style="border-radius: 20px; white-space: nowrap;">
+          <i class="bi bi-plus-circle-fill me-1"></i> {% if driver %}Complete Fleet Profile &raquo;{% else %}Add Fleet Details &raquo;{% endif %}
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Off Duty Notice Alert (Only when not booked on active dispatches) -->
+    {% if is_fleet_complete and not driver.available and total_active == 0 %}
+    <div class="alert alert-secondary d-flex flex-column flex-md-row align-items-md-center justify-content-between p-3 mb-4 gap-3" 
+         style="background: rgba(148, 163, 184, 0.12); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 14px;">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-2 rounded-circle" style="background: rgba(148, 163, 184, 0.2); color: #cbd5e1; font-size: 1.4rem;">
+          <i class="bi bi-pause-circle-fill"></i>
+        </div>
+        <div>
+          <strong class="text-white d-block">You are currently Off Duty &bull; Inactive for Dispatch</strong>
+          <span class="small text-white-50">Customers and the TMS system cannot assign new shipments to your truck while you are off duty. Switch to On Duty whenever you are ready to receive loads.</span>
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'toggle_driver_duty' %}" class="btn btn-success btn-sm fw-bold px-3 py-2" style="border-radius: 20px; white-space: nowrap;">
+          <i class="bi bi-play-circle-fill me-1"></i> Go On Duty Now &raquo;
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Active Delivery Metrics Summary -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(5, 148, 252, 0.15); color: #0594fc; font-size: 1.6rem;">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Active Deliveries</span>
+            <h3 class="mb-0 text-white fw-bold">{{ total_active }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 1.6rem;">
+            <i class="bi bi-hourglass-split"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Pending Start</span>
+            <h3 class="mb-0 text-white fw-bold">{{ pending_count }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; font-size: 1.6rem;">
+            <i class="bi bi-truck"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">In Transit</span>
+            <h3 class="mb-0 text-white fw-bold">{{ in_transit_count }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; font-size: 1.6rem;">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Out for Delivery</span>
+            <h3 class="mb-0 text-white fw-bold">{{ out_for_delivery_count }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Delivery Cards List -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="h5 fw-bold text-white mb-0">
+        <i class="bi bi-list-task text-primary me-2"></i>Active Consignments Requiring Action ({{ shipments|length }})
+      </h3>
+      <span class="text-white-50 small">Updated live from dispatch</span>
+    </div>
+
+    {% if shipments %}
+      <div class="row g-4">
+        {% for shipment in shipments %}
+          <div class="col-12">
+            <div class="delivery-card">
+              
+              <!-- Card Header -->
+              <div class="delivery-card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <span class="badge" style="background: rgba(5, 148, 252, 0.2); color: #38bdf8; font-family: monospace; font-size: 0.95rem; border: 1px solid rgba(5, 148, 252, 0.4);">
+                    <i class="bi bi-upc-scan me-1"></i> TRK: {{ shipment.tracking_id|stringformat:"s"|slice:":8" }}...
+                  </span>
+                  <button class="btn btn-sm btn-link text-white-50 p-0" onclick="navigator.clipboard.writeText('{{ shipment.tracking_id }}'); if (window.showTmsToast) { window.showTmsToast('Tracking ID copied: {{ shipment.tracking_id }}', 'success', 4000); } else { alert('Tracking ID copied'); }" title="Copy full Tracking UUID">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                  <span class="text-white-50 small ms-2">
+                    <i class="bi bi-calendar-event me-1"></i> Booked: {{ shipment.order_date|date:"d M Y"|default:"Today" }}
+                  </span>
+                </div>
+
+                <!-- Current Status Pill -->
+                <div>
+                  <span class="status-badge status-{{ shipment.status }}">
+                    {% if shipment.status == 'processing' %}
+                      <i class="bi bi-hourglass-top"></i> Processing
+                    {% elif shipment.status == 'shipped' %}
+                      <i class="bi bi-box-arrow-right"></i> Shipped
+                    {% elif shipment.status == 'in_transit' %}
+                      <i class="bi bi-truck"></i> In Transit
+                    {% elif shipment.status == 'out_for_delivery' %}
+                      <i class="bi bi-geo-alt-fill"></i> Out for Delivery
+                    {% else %}
+                      <i class="bi bi-circle"></i> {{ shipment.get_status_display }}
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Card Body: Route, Customer, and Cargo Details -->
+              <div class="p-4">
+                <div class="row g-4">
+                  
+                  <!-- Route Info -->
+                  <div class="col-lg-5">
+                    <label class="text-white-50 small fw-bold text-uppercase mb-2 d-block">
+                      <i class="bi bi-signpost-split me-1 text-primary"></i> Delivery Route
+                    </label>
+                    <div class="route-container">
+                      <div class="route-point mb-3">
+                        <div class="p-2 rounded-circle" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                          <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <div>
+                          <small class="text-white-50 d-block">Pickup Location</small>
+                          <strong class="text-white fs-6">{{ shipment.get_from_destination_display|default:shipment.from_destination }} Hub</strong>
+                        </div>
+                      </div>
+
+                      <div class="d-flex align-items-center ps-3 mb-3">
+                        <div style="border-left: 2px dashed rgba(5, 148, 252, 0.4); height: 26px; margin-left: 5px;"></div>
+                        <i class="bi bi-arrow-down text-info ms-2" style="font-size: 1.1rem;"></i>
+                      </div>
+
+                      <div class="route-point">
+                        <div class="p-2 rounded-circle" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                          <i class="bi bi-flag-fill"></i>
+                        </div>
+                        <div>
+                          <small class="text-white-50 d-block">Drop-off Destination</small>
+                          <strong class="text-white fs-6">{{ shipment.get_to_destination_display|default:shipment.to_destination }} Delivery Point</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Customer / Recipient Details -->
+                  <div class="col-lg-4">
+                    <label class="text-white-50 small fw-bold text-uppercase mb-2 d-block">
+                      <i class="bi bi-person-fill me-1 text-primary"></i> Recipient Customer
+                    </label>
+                    <div class="p-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                      <h6 class="text-white fw-bold mb-1">
+                        {{ shipment.customer.customer_name|default:"Consignee (Not specified)" }}
+                      </h6>
+                      
+                      {% if shipment.customer.phone_number %}
+                        <p class="mb-2">
+                          <a href="tel:{{ shipment.customer.phone_number }}" class="text-info text-decoration-none fw-semibold">
+                            <i class="bi bi-telephone-fill me-1"></i> {{ shipment.customer.phone_number }}
+                          </a>
+                        </p>
+                      {% endif %}
+
+                      <p class="text-white-50 small mb-1">
+                        <i class="bi bi-pin-map-fill text-warning me-1"></i>
+                        {{ shipment.customer.address|default:"Delivery address on file" }}
+                      </p>
+
+                      {% if shipment.customer.email %}
+                        <p class="text-white-50 small mb-0">
+                          <i class="bi bi-envelope me-1"></i> {{ shipment.customer.email }}
+                        </p>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Cargo Information -->
+                  <div class="col-lg-3">
+                    <label class="text-white-50 small fw-bold text-uppercase mb-2 d-block">
+                      <i class="bi bi-boxes me-1 text-primary"></i> Cargo Specifications
+                    </label>
+                    <div class="p-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06);">
+                      <div class="mb-2">
+                        <small class="text-white-50 d-block">Package Count & Vehicle:</small>
+                        <span class="badge bg-secondary fs-6 text-white px-2 py-1">
+                          {{ shipment.quantity|default:1 }} Units
+                        </span>
+                        {% if shipment.truck_type %}
+                          <span class="badge bg-info-subtle text-info border border-info border-opacity-25 px-2 py-1 ms-1" style="font-size: 0.8rem;">
+                            <i class="bi bi-truck me-1"></i>{{ shipment.get_truck_type_display }}
+                          </span>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <small class="text-white-50 d-block">Description:</small>
+                        <span class="text-white small">
+                          {{ shipment.package_description|default:"Standard Commercial Parcel" }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Driver Action Toolbar: Direct Start & Status Editing -->
+              <div class="action-bar d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                
+                <!-- Quick 1-Click Progression Buttons -->
+                <form method="POST" action="{% url 'update_delivery_status' shipment.id %}" class="d-flex flex-wrap align-items-center gap-2 mb-0">
+                  {% csrf_token %}
+                  
+                  {% if shipment.status == 'processing' or shipment.status == 'shipped' %}
+                    <button type="submit" name="status" value="in_transit" class="btn-start-trip">
+                      <i class="bi bi-play-circle-fill me-1"></i> Start Delivery Route
+                    </button>
+                    <span class="text-white-50 small ms-1">(Begins transit & notifies customer)</span>
+                  {% elif shipment.status == 'in_transit' %}
+                    <button type="submit" name="status" value="out_for_delivery" class="btn-transit">
+                      <i class="bi bi-geo-alt-fill me-1"></i> Mark Out for Delivery
+                    </button>
+                    <button type="submit" name="status" value="delivered" class="btn-complete-trip" onclick="return confirm('Confirm delivery of this shipment? It will be archived to your Delivery History.');">
+                      <i class="bi bi-check-circle-fill me-1"></i> Mark Delivered
+                    </button>
+                  {% elif shipment.status == 'out_for_delivery' %}
+                    <button type="submit" name="status" value="delivered" class="btn-complete-trip" onclick="return confirm('Confirm delivery of this shipment? It will be archived to your Delivery History.');">
+                      <i class="bi bi-check2-circle me-1"></i> Complete & Mark Delivered
+                    </button>
+                  {% endif %}
+                </form>
+
+                <!-- Full Status Edit Dropdown (Any Status Override) -->
+                <div class="d-flex align-items-center gap-2">
+                  <form method="POST" action="{% url 'update_delivery_status' shipment.id %}" class="d-flex align-items-center gap-2 mb-0">
+                    {% csrf_token %}
+                    <span class="text-white-50 small" style="white-space: nowrap;">Change Status:</span>
+                    <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary" style="min-width: 155px; border-radius: 8px;">
+                      {% for val, label in status_choices %}
+                        <option value="{{ val }}" {% if shipment.status == val %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
+                      Update
+                    </button>
+                  </form>
+
+                  <a href="{% url 'track' %}?tracking_id={{ shipment.tracking_id }}" target="_blank" class="btn btn-sm btn-outline-light" style="border-radius: 8px;" title="View public tracker">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <!-- Empty State: No Active Deliveries -->
+      <div class="text-center py-5 px-4 my-4" style="background: rgba(14, 29, 52, 0.4); border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 20px;">
+        <div class="mb-4">
+          <i class="bi bi-check2-circle text-success" style="font-size: 4rem;"></i>
+        </div>
+        <h4 class="text-white fw-bold mb-2">No Active Deliveries Assigned</h4>
+        <p class="text-white-50 mx-auto mb-4" style="max-width: 500px;">
+          You're all caught up! There are currently no pending shipments in your transit queue. When new customer shipments are booked and auto-assigned to you, they will appear here.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{% url 'driver_history' %}" class="btn btn-primary px-4 py-2" style="border-radius: 25px; font-weight: 600;">
+            <i class="bi bi-clock-history me-1"></i> View Past Delivery History
+          </a>
+          <a href="{% url 'home' %}" class="btn btn-outline-light px-4 py-2" style="border-radius: 25px;">
+            <i class="bi bi-house me-1"></i> Dashboard Home
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

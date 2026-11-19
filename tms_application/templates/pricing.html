@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" style="background-image: url('{% static 'assets/img/page-title-bg.jpg' %}');">
+      <div class="container position-relative">
+        <h1>Transparent Freight Pricing</h1>
+        <p>Competitive, category-based transportation rates with verified commercial carriers and zero hidden charges.</p>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li class="current">Pricing</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Alt Pricing Section -->
+    <section id="alt-pricing" class="alt-pricing section">
+
+      <!-- Section Title -->
+      <div class="container section-title">
+        <span>Freight Plans<br></span>
+        <h2>Commercial Transport Tiers</h2>
+        <p>Choose the payload class best suited for your consignments and logistics volume.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4 pricing-item">
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div>
+              <h3 class="mb-1">Express Cargo</h3>
+              <small class="text-muted">Mini Van & Small Truck</small>
+            </div>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <h4>Payload<span> Up to 2.5 Tons</span></h4>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <ul>
+              <li><i class="bi bi-check"></i> <span>Intra-city & express parcels</span></li>
+              <li><i class="bi bi-check"></i> <span>Automated driver dispatch</span></li>
+              <li><i class="bi bi-check"></i> <span>Real-time UUID tracking</span></li>
+            </ul>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div class="text-center"><a href="{% url 'add_shipment' %}" class="buy-btn">Book Shipment</a></div>
+          </div>
+        </div><!-- End Pricing Item -->
+
+        <div class="row gy-4 pricing-item featured mt-4">
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div>
+              <h3 class="mb-1">Heavy Commercial</h3>
+              <small class="text-muted">Flatbed & Container</small>
+            </div>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <h4>Payload<span> Up to 20 Tons</span></h4>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <ul>
+              <li><i class="bi bi-check"></i> <span>Weather-sealed containers & flatbeds</span></li>
+              <li><i class="bi bi-check"></i> <strong>Inter-state transit network</strong></li>
+              <li><i class="bi bi-check"></i> <span>Direct driver dispatch contact</span></li>
+            </ul>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div class="text-center"><a href="{% url 'add_shipment' %}" class="buy-btn">Book Shipment</a></div>
+          </div>
+        </div><!-- End Pricing Item -->
+
+        <div class="row gy-4 pricing-item mt-4">
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div>
+              <h3 class="mb-1">Bulk & Long-Haul</h3>
+              <small class="text-muted">Trailer & Tanker Truck</small>
+            </div>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <h4>Payload<span> Up to 25T / 15kL</span></h4>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <ul>
+              <li><i class="bi bi-check"></i> <span>Multi-axle commercial trailers</span></li>
+              <li><i class="bi bi-check"></i> <span>Specialized liquid & chemical tankers</span></li>
+              <li><i class="bi bi-check"></i> <span>Priority dispatch & milestone alerts</span></li>
+            </ul>
+          </div>
+          <div class="col-lg-3 d-flex align-items-center justify-content-center">
+            <div class="text-center"><a href="{% url 'add_shipment' %}" class="buy-btn">Book Shipment</a></div>
+          </div>
+        </div><!-- End Pricing Item -->
+
+      </div>
+
+    </section><!-- /Alt Pricing Section -->
+
+  </main>
+
+  {% endblock %}

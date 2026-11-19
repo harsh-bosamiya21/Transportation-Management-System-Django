@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+.orders-page-wrapper {
+  background: linear-gradient(180deg, #071224 0%, #0c1c38 100%);
+  min-height: 85vh;
+  padding: 170px 0 80px 0;
+  color: #fff;
+}
+
+.stats-card {
+  background: rgba(14, 29, 52, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.orders-table-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
+  color: #0f172a !important;
+}
+
+.orders-table-card .card-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.table-custom {
+  --bs-table-bg: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  margin-bottom: 0;
+}
+
+.table-custom thead th {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.8px;
+  border-bottom: 2px solid #cbd5e1 !important;
+  padding: 16px 20px;
+}
+
+.table-custom tbody tr {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  transition: background 0.2s;
+  color: #0f172a !important;
+}
+
+.table-custom tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.table-custom td {
+  background-color: inherit !important;
+  color: #0f172a !important;
+  padding: 18px 20px;
+  vertical-align: middle;
+}
+
+.orders-table-card h5,
+.orders-table-card h4,
+.table-custom td,
+.table-custom th {
+  color: #0f172a !important;
+}
+
+.btn-track {
+  background: #0594fc;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+
+.btn-track:hover {
+  background: #0077cc;
+  color: #fff;
+  transform: scale(1.04);
+}
+</style>
+
+<main class="main orders-page-wrapper">
+  
+  <!-- Header Title -->
+  <div class="orders-header mb-4 py-3" style="background: rgba(14, 29, 52, 0.6); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center px-4">
+      <div>
+        <h1 class="display-6 font-weight-bold mb-2" style="color: #ffffff;">
+          <i class="bi bi-box-seam me-2" style="color: #0594fc;"></i> My Order History
+        </h1>
+        <p class="text-white-50 mb-0">
+          Track and review all shipments booked under your account (<strong>{{ user.username }}</strong>).
+        </p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <a href="{% url 'add_shipment' %}" class="btn btn-primary px-4 py-2" style="background: #0594fc; border-color: #0594fc; border-radius: 25px; font-weight: 600; box-shadow: 0 4px 15px rgba(5, 148, 252, 0.4);">
+          <i class="bi bi-plus-circle me-1"></i> Book New Shipment
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Metric Summary Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(5, 148, 252, 0.15); color: #0594fc; font-size: 1.8rem;">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Total Orders</span>
+            <h3 class="mb-0 text-white font-weight-bold">{{ total_orders }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-size: 1.8rem;">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Processing</span>
+            <h3 class="mb-0 text-white font-weight-bold">{{ processing_orders }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9; font-size: 1.8rem;">
+            <i class="bi bi-truck"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">In Transit</span>
+            <h3 class="mb-0 text-white font-weight-bold">{{ in_transit_orders }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="stats-card d-flex align-items-center">
+          <div class="me-3 p-3 rounded-circle" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 1.8rem;">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div>
+            <span class="text-white-50 small d-block">Delivered</span>
+            <h3 class="mb-0 text-white font-weight-bold">{{ delivered_orders }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Table / List -->
+    <div class="card orders-table-card">
+      <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important;">
+        <h5 class="mb-0 font-weight-bold" style="color: #0f172a !important;">
+          <i class="bi bi-card-checklist me-2 text-primary"></i> 
+          {% if role_type == 'driver' %}Shipment Trips{% else %}Order History List{% endif %}
+        </h5>
+        <span class="badge bg-primary px-3 py-1">{{ shipments|length }} Records</span>
+      </div>
+
+      {% if shipments %}
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>Tracking ID</th>
+                <th>Order Date</th>
+                <th>Route</th>
+                <th>Package Description</th>
+                <th>Assigned Driver</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for shipment in shipments %}
+                <tr>
+                  <td>
+                    <span class="fw-bold font-monospace" style="font-size: 0.95rem; color: #0f172a !important;">
+                      {{ shipment.tracking_id|stringformat:"s"|slice:":8" }}...
+                    </span>
+                    <button class="btn btn-sm btn-link text-primary p-0 ms-1" onclick="navigator.clipboard.writeText('{{ shipment.tracking_id }}'); if (window.showTmsToast) { window.showTmsToast('Tracking ID copied: {{ shipment.tracking_id }}', 'success', 4000); } else { alert('Tracking ID copied'); }" title="Copy full Tracking ID">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  </td>
+                  <td>
+                    <span class="d-block fw-semibold" style="color: #0f172a !important;">{{ shipment.order_date|date:"d M Y"|default:"-" }}</span>
+                    {% if shipment.shipment_date %}
+                      <small class="d-block" style="color: #64748b !important;">Dispatched: {{ shipment.shipment_date|date:"d M Y" }}</small>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-1">
+                      <span class="badge" style="background: #e2e8f0; color: #0f172a; font-weight: 600; padding: 6px 10px; border-radius: 8px;">{{ shipment.get_from_destination_display }}</span>
+                      <i class="bi bi-arrow-right text-primary fw-bold"></i>
+                      <span class="badge" style="background: #e2e8f0; color: #0f172a; font-weight: 600; padding: 6px 10px; border-radius: 8px;">{{ shipment.get_to_destination_display }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="fw-bold d-block" style="color: #0f172a !important;">{{ shipment.package_description|truncatechars:25|default:"Package" }}</span>
+                    <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                      <small class="fw-semibold" style="color: #64748b !important;">Qty: {{ shipment.quantity|default:"1" }}</small>
+                      {% if shipment.truck_type %}
+                        <span class="badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-size: 0.75rem; font-weight: 600;">
+                          <i class="bi bi-truck me-1"></i>{{ shipment.get_truck_type_display }}
+                        </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if role_type == 'driver' %}
+                      <span class="fw-semibold" style="color: #0f172a !important;">{{ shipment.customer.customer_name|default:"Customer" }}</span>
+                      {% if shipment.customer.phone_number %}
+                        <small class="d-block" style="color: #64748b !important;"><i class="bi bi-telephone me-1"></i>{{ shipment.customer.phone_number }}</small>
+                      {% endif %}
+                    {% else %}
+                      {% if shipment.driver %}
+                        <span class="fw-semibold d-block" style="color: #0f172a !important;">{{ shipment.driver.driver_name }}</span>
+                        <small class="d-block" style="color: #64748b !important;">{{ shipment.driver.get_vehicle_type_display }} &bull; {{ shipment.driver.vehicle_number_plate }}</small>
+                      {% else %}
+                        <span class="fst-italic" style="color: #64748b !important;">Pending Assignment</span>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if shipment.status == 'delivered' %}
+                      <span class="badge bg-success px-3 py-2" style="border-radius: 12px;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Delivered
+                      </span>
+                    {% elif shipment.status == 'out_for_delivery' %}
+                      <span class="badge bg-warning text-dark px-3 py-2" style="border-radius: 12px;">
+                        <i class="bi bi-bicycle me-1"></i> Out for Delivery
+                      </span>
+                    {% elif shipment.status == 'in_transit' %}
+                      <span class="badge bg-info text-dark px-3 py-2" style="border-radius: 12px;">
+                        <i class="bi bi-truck me-1"></i> In Transit
+                      </span>
+                    {% elif shipment.status == 'shipped' %}
+                      <span class="badge bg-primary px-3 py-2" style="border-radius: 12px;">
+                        <i class="bi bi-box-seam me-1"></i> Shipped
+                      </span>
+                    {% else %}
+                      <span class="badge bg-secondary px-3 py-2" style="border-radius: 12px;">
+                        <i class="bi bi-clock-history me-1"></i> Processing
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <a href="{% url 'track' %}?tracking_id={{ shipment.tracking_id }}" class="btn-track" title="Track Live">
+                      <i class="bi bi-geo-alt-fill"></i> Track Live
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5 px-3">
+          <i class="bi bi-inbox" style="font-size: 3.5rem; color: #94a3b8;"></i>
+          <h4 class="mt-3 font-weight-bold" style="color: #0f172a !important;">No Orders Found</h4>
+          <p class="mb-4" style="color: #64748b !important;">You have not booked any shipments yet or no deliveries are currently assigned.</p>
+          {% if role_type != 'driver' %}
+            <a href="{% url 'add_shipment' %}" class="btn btn-primary px-4 py-2" style="border-radius: 25px; background: #0594fc; border-color: #0594fc; font-weight: 600;">
+              <i class="bi bi-plus-lg me-1"></i> Book Your First Shipment
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}
