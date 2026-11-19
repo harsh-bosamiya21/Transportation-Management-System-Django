@@ -2,6 +2,9 @@ from django import forms
 from .models import User
 from .models import  NewCustomer, NewDriver, NewShipment
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+import re
 
 
 
@@ -14,16 +17,46 @@ class SignUpForm(UserCreationForm):
         )
     )
     password1 = forms.CharField(
+        label="Password",
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control"
+                "class": "form-control",
+                "placeholder": "Create a strong password"
+            }
+        )
+    )
+    password2 = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Confirm your password"
             }
         )
     )
 
     class Meta:
         model = User
-        fields = ('username', 'password1', 'is_driver', 'is_customer')
+        fields = ('username', 'password1', 'password2', 'is_driver', 'is_customer')
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError("Passwords do not match.")
+            if len(password2) < 8:
+                raise ValidationError("Password must be at least 8 characters long.")
+            if not re.search(r'[A-Z]', password2):
+                raise ValidationError("Password must contain at least one uppercase letter (A-Z).")
+            if not re.search(r'[a-z]', password2):
+                raise ValidationError("Password must contain at least one lowercase letter (a-z).")
+            if not re.search(r'\d', password2):
+                raise ValidationError("Password must contain at least one number (0-9).")
+            if not re.search(r'[@$!%*?&_\-#~^+=<>;:,.]', password2):
+                raise ValidationError("Password must contain at least one special character (@$!%*?&_ etc.).")
+            validate_password(password2, self.instance)
+        return password2
 
 
 

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect,  get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -9,6 +11,7 @@ from django.core.mail import send_mail
 from .forms import CustomerForm, DriverForm, ShipmentForm, TrackingForm, ContactForm, SignUpForm
 from .models import NewShipment, NewCustomer, NewDriver,  Package  # Import your models
 import uuid
+import re
 import json
 
 
@@ -171,6 +174,7 @@ def sign_up(request):
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
+        confirm_password = request.POST.get('confirm_password', '')
         role = request.POST.get('role', 'customer')
 
         # Validate form inputs
@@ -194,6 +198,47 @@ def sign_up(request):
         # Check if email is already registered in database
         if User.objects.filter(email__iexact=email).exists():
             error = f"An account with email '{email}' already exists. Please log in or use a different email."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        # Password confirmation check (if confirm_password field is present)
+        if 'confirm_password' in request.POST and password != confirm_password:
+            error = "Passwords do not match. Please ensure both passwords are identical."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        # Password complexity validation
+        if len(password) < 8:
+            error = "Password must be at least 8 characters long."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        if not re.search(r'[A-Z]', password):
+            error = "Password must contain at least one uppercase letter (A-Z)."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        if not re.search(r'[a-z]', password):
+            error = "Password must contain at least one lowercase letter (a-z)."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        if not re.search(r'\d', password):
+            error = "Password must contain at least one number (0-9)."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        if not re.search(r'[@$!%*?&_\-#~^+=<>;:,.]', password):
+            error = "Password must contain at least one special character (@$!%*?&_ etc.)."
+            messages.error(request, error)
+            return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
+
+        # Enforce Django AUTH_PASSWORD_VALIDATORS from settings (similarity, common passwords, etc.)
+        temp_user = User(username=username, email=email)
+        try:
+            validate_password(password, user=temp_user)
+        except ValidationError as e:
+            error = " ".join(e.messages)
             messages.error(request, error)
             return render(request, 'sign_up.html', {'error': error, 'username': username, 'email': email, 'role': role})
 

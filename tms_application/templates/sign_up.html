@@ -305,6 +305,52 @@
       color: #ffffff;
     }
 
+    /* Password requirements checklist */
+    .password-checklist {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+    }
+
+    .password-checklist-title {
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #94a3b8;
+      margin-bottom: 3px;
+      transition: color 0.2s ease;
+    }
+
+    .checklist-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .checklist-item.valid {
+      color: #10b981 !important;
+      font-weight: 500;
+    }
+
+    .checklist-item.valid i {
+      color: #10b981 !important;
+    }
+
+    .checklist-item i {
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
     /* Role Selection Grid */
     .role-section-label {
       font-size: 0.88rem;
@@ -718,7 +764,7 @@
         </div>
 
         <!-- Form -->
-        <form action="{% url 'sign_up' %}" method="post" autocomplete="on">
+        <form action="{% url 'sign_up' %}" method="post" autocomplete="on" id="signupForm">
           {% csrf_token %}
 
           <!-- Username -->
@@ -775,6 +821,8 @@
                 class="form-control-custom" 
                 placeholder="Create a strong password" 
                 required
+                autocomplete="new-password"
+                minlength="8"
               >
               <button 
                 type="button" 
@@ -785,6 +833,66 @@
               >
                 <i class="bi bi-eye" id="togglePasswordIcon"></i>
               </button>
+            </div>
+
+            <!-- Password validation checklist -->
+            <div class="password-checklist" id="passwordChecklist">
+              <div class="password-checklist-title">
+                <i class="bi bi-shield-lock"></i>
+                <span>Password Requirements</span>
+              </div>
+              <div class="checklist-item" id="rule-length">
+                <i class="bi bi-circle"></i>
+                <span>At least 8 characters</span>
+              </div>
+              <div class="checklist-item" id="rule-upper">
+                <i class="bi bi-circle"></i>
+                <span>At least 1 uppercase letter (A-Z)</span>
+              </div>
+              <div class="checklist-item" id="rule-lower">
+                <i class="bi bi-circle"></i>
+                <span>At least 1 lowercase letter (a-z)</span>
+              </div>
+              <div class="checklist-item" id="rule-number">
+                <i class="bi bi-circle"></i>
+                <span>At least 1 number (0-9)</span>
+              </div>
+              <div class="checklist-item" id="rule-special">
+                <i class="bi bi-circle"></i>
+                <span>At least 1 special character (@$!%*?&_#...)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label class="form-label" for="id_confirm_password">
+              <span>Confirm Password</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-shield-check input-icon"></i>
+              <input 
+                type="password" 
+                id="id_confirm_password" 
+                name="confirm_password" 
+                class="form-control-custom" 
+                placeholder="Re-enter your password" 
+                required
+                autocomplete="new-password"
+              >
+              <button 
+                type="button" 
+                class="btn-toggle-password" 
+                id="toggleConfirmPassword" 
+                title="Show / Hide confirm password"
+                aria-label="Toggle confirm password visibility"
+              >
+                <i class="bi bi-eye" id="toggleConfirmPasswordIcon"></i>
+              </button>
+            </div>
+            <div class="checklist-item" id="rule-match" style="margin-top: 6px; font-size: 0.78rem;">
+              <i class="bi bi-circle"></i>
+              <span>Passwords must match</span>
             </div>
           </div>
 
@@ -887,6 +995,151 @@
           const isPassword = passwordInput.type === 'password';
           passwordInput.type = isPassword ? 'text' : 'password';
           toggleIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+      }
+
+      // Confirm Password toggle
+      const toggleConfirmBtn = document.getElementById('toggleConfirmPassword');
+      const confirmInput = document.getElementById('id_confirm_password');
+      const toggleConfirmIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+      if (toggleConfirmBtn && confirmInput) {
+        toggleConfirmBtn.addEventListener('click', function() {
+          const isPassword = confirmInput.type === 'password';
+          confirmInput.type = isPassword ? 'text' : 'password';
+          toggleConfirmIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+      }
+
+      // Real-time password validation rule checker
+      function updatePasswordRules() {
+        const val = passwordInput ? passwordInput.value : '';
+        const confirmVal = confirmInput ? confirmInput.value : '';
+
+        const hasLength = val.length >= 8;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasLower = /[a-z]/.test(val);
+        const hasNumber = /[0-9]/.test(val);
+        const hasSpecial = /[@$!%*?&_\-#~^+=<>;:,.]/.test(val);
+        const matches = (val.length > 0 && confirmVal.length > 0 && val === confirmVal);
+
+        setRuleStatus('rule-length', hasLength);
+        setRuleStatus('rule-upper', hasUpper);
+        setRuleStatus('rule-lower', hasLower);
+        setRuleStatus('rule-number', hasNumber);
+        setRuleStatus('rule-special', hasSpecial);
+
+        const ruleMatch = document.getElementById('rule-match');
+        if (ruleMatch) {
+          const matchIcon = ruleMatch.querySelector('i');
+          if (confirmVal.length === 0) {
+            ruleMatch.className = 'checklist-item';
+            ruleMatch.style.color = '#94a3b8';
+            if (matchIcon) matchIcon.className = 'bi bi-circle';
+          } else if (matches) {
+            ruleMatch.className = 'checklist-item valid';
+            ruleMatch.style.color = '#10b981';
+            if (matchIcon) matchIcon.className = 'bi bi-check-circle-fill';
+          } else {
+            ruleMatch.className = 'checklist-item';
+            ruleMatch.style.color = '#f87171';
+            if (matchIcon) matchIcon.className = 'bi bi-x-circle-fill';
+          }
+        }
+      }
+
+      function setRuleStatus(id, isValid) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const icon = el.querySelector('i');
+        if (isValid) {
+          el.className = 'checklist-item valid';
+          if (icon) icon.className = 'bi bi-check-circle-fill';
+        } else {
+          el.className = 'checklist-item';
+          if (icon) icon.className = 'bi bi-circle';
+        }
+      }
+
+      if (passwordInput) {
+        passwordInput.addEventListener('input', updatePasswordRules);
+      }
+      if (confirmInput) {
+        confirmInput.addEventListener('input', updatePasswordRules);
+      }
+
+      // Form submission validation guard
+      const signupForm = document.getElementById('signupForm');
+      if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+          const val = passwordInput ? passwordInput.value : '';
+          const confirmVal = confirmInput ? confirmInput.value : '';
+
+          if (val.length < 8) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Password must be at least 8 characters long.', 'error');
+            } else {
+              alert('Password must be at least 8 characters long.');
+            }
+            passwordInput.focus();
+            return false;
+          }
+
+          if (!/[A-Z]/.test(val)) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Password must contain at least one uppercase letter (A-Z).', 'error');
+            } else {
+              alert('Password must contain at least one uppercase letter (A-Z).');
+            }
+            passwordInput.focus();
+            return false;
+          }
+
+          if (!/[a-z]/.test(val)) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Password must contain at least one lowercase letter (a-z).', 'error');
+            } else {
+              alert('Password must contain at least one lowercase letter (a-z).');
+            }
+            passwordInput.focus();
+            return false;
+          }
+
+          if (!/[0-9]/.test(val)) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Password must contain at least one number (0-9).', 'error');
+            } else {
+              alert('Password must contain at least one number (0-9).');
+            }
+            passwordInput.focus();
+            return false;
+          }
+
+          if (!/[@$!%*?&_\-#~^+=<>;:,.]/.test(val)) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Password must contain at least one special character (@$!%*?&_ etc.).', 'error');
+            } else {
+              alert('Password must contain at least one special character.');
+            }
+            passwordInput.focus();
+            return false;
+          }
+
+          if (confirmVal !== val) {
+            e.preventDefault();
+            if (window.showTmsToast) {
+              window.showTmsToast('Passwords do not match. Please ensure both passwords are identical.', 'error');
+            } else {
+              alert('Passwords do not match.');
+            }
+            confirmInput.focus();
+            return false;
+          }
         });
       }
 

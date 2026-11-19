@@ -132,3 +132,95 @@ class TmsCoreWorkflowTests(TestCase):
         res_driver = self.client.get(reverse('manage'))
         self.assertEqual(res_driver.status_code, 302)
         self.assertEqual(res_driver.url, reverse('driver_deliveries'))
+
+    def test_signup_password_too_short(self):
+        """Rejects passwords shorter than 8 characters."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser1',
+            'email': 'newuser1@example.com',
+            'password': 'Pass1!',
+            'confirm_password': 'Pass1!',
+            'role': 'customer'
+        })
+        # Should re-render signup with error, not redirect to login
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Password must be at least 8 characters long")
+        self.assertFalse(User.objects.filter(username='newuser1').exists())
+
+    def test_signup_password_missing_uppercase(self):
+        """Rejects passwords without an uppercase letter."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser2',
+            'email': 'newuser2@example.com',
+            'password': 'password123!',
+            'confirm_password': 'password123!',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "uppercase letter")
+        self.assertFalse(User.objects.filter(username='newuser2').exists())
+
+    def test_signup_password_missing_lowercase(self):
+        """Rejects passwords without a lowercase letter."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser3',
+            'email': 'newuser3@example.com',
+            'password': 'PASSWORD123!',
+            'confirm_password': 'PASSWORD123!',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "lowercase letter")
+        self.assertFalse(User.objects.filter(username='newuser3').exists())
+
+    def test_signup_password_missing_number(self):
+        """Rejects passwords without a digit."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser4',
+            'email': 'newuser4@example.com',
+            'password': 'Password!xyz',
+            'confirm_password': 'Password!xyz',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "number (0-9)")
+        self.assertFalse(User.objects.filter(username='newuser4').exists())
+
+    def test_signup_password_missing_special_char(self):
+        """Rejects passwords without a special character."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser5',
+            'email': 'newuser5@example.com',
+            'password': 'Password1234',
+            'confirm_password': 'Password1234',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "special character")
+        self.assertFalse(User.objects.filter(username='newuser5').exists())
+
+    def test_signup_password_mismatch(self):
+        """Rejects registration when confirm_password does not match password."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'newuser6',
+            'email': 'newuser6@example.com',
+            'password': 'SecurePassword123!',
+            'confirm_password': 'DifferentPassword123!',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Passwords do not match")
+        self.assertFalse(User.objects.filter(username='newuser6').exists())
+
+    def test_signup_strong_password_success(self):
+        """Accepts strong password and creates account successfully."""
+        res = self.client.post(reverse('sign_up'), {
+            'username': 'stronguser',
+            'email': 'stronguser@example.com',
+            'password': 'SecureP@ssw0rd2026',
+            'confirm_password': 'SecureP@ssw0rd2026',
+            'role': 'customer'
+        })
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('login', res.url)
+        self.assertTrue(User.objects.filter(username='stronguser').exists())
