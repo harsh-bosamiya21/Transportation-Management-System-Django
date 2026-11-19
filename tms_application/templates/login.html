@@ -693,7 +693,7 @@
               <input type="checkbox" name="remember_me" id="rememberMe">
               <span>Remember me</span>
             </label>
-            <a href="#" class="forgot-password-link" onclick="if (window.showTmsToast) { window.showTmsToast('Please contact your TMS system administrator or create a new account.', 'info', 4000); } else { alert('Please contact administrator.'); } return false;">
+            <a href="{% url 'forgot_password' %}" class="forgot-password-link">
               Forgot password?
             </a>
           </div>

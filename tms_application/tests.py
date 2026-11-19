@@ -224,3 +224,59 @@ class TmsCoreWorkflowTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertIn('login', res.url)
         self.assertTrue(User.objects.filter(username='stronguser').exists())
+
+    def test_forgot_password_page_renders(self):
+        """Forgot password page should load with 200 OK."""
+        res = self.client.get(reverse('forgot_password'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Forgot Password")
+
+    def test_forgot_password_unknown_user(self):
+        """Submitting non-existent email/username shows error."""
+        res = self.client.post(reverse('forgot_password'), {
+            'identifier': 'nonexistent@example.com'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "No account found matching")
+
+    def test_forgot_password_valid_user(self):
+        """Submitting registered customer email renders success and generates reset token."""
+        res = self.client.post(reverse('forgot_password'), {
+            'identifier': 'customer@example.com'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Reset Link Generated")
+
+    def test_reset_password_invalid_token(self):
+        """Invalid token should be rejected on reset password page."""
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        uidb64 = urlsafe_base64_encode(force_bytes(self.customer_user.pk))
+        res = self.client.get(reverse('reset_password', kwargs={'uidb64': uidb64, 'token': 'invalid-token-xyz'}))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "invalid or has expired")
+
+    def test_reset_password_success(self):
+        """Valid token resets user password and verifies login with new password."""
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+
+        uidb64 = urlsafe_base64_encode(force_bytes(self.customer_user.pk))
+        token = default_token_generator.make_token(self.customer_user)
+
+        # POST new strong password
+        new_pass = "BrandNewP@ssw0rd2026!"
+        res = self.client.post(
+            reverse('reset_password', kwargs={'uidb64': uidb64, 'token': token}),
+            {'password': new_pass, 'confirm_password': new_pass}
+        )
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('login', res.url)
+
+        # Verify old password no longer works
+        self.customer_user.refresh_from_db()
+        self.assertFalse(self.customer_user.check_password('Password123!'))
+
+        # Verify new password works
+        self.assertTrue(self.customer_user.check_password(new_pass))

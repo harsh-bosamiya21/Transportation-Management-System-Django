@@ -20,6 +20,8 @@ urlpatterns = [
     path('add_driver/', views.add_driver, name='add_driver'),
     path('add_shipment/', views.add_shipment, name='add_shipment'),
     path('login/', views.user_login, name='login'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
     path('sign_up/', views.sign_up, name='sign_up'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

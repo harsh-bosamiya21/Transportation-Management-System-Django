@@ -4,6 +4,11 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.conf import settings
+from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -165,6 +170,137 @@ def user_login(request):
             return render(request, 'login.html', {'error': error, 'username': username})
 
     return render(request, 'login.html')
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        identifier = request.POST.get('identifier', '').strip()
+
+        if not identifier:
+            error = "Please enter your registered email address or username."
+            messages.error(request, error)
+            return render(request, 'forgot_password.html', {'error': error})
+
+        # Look up user by email or username
+        user = User.objects.filter(email__iexact=identifier).first() or \
+               User.objects.filter(username__iexact=identifier).first()
+
+        if user:
+            # Generate one-time secure password reset token
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = request.build_absolute_uri(
+                reverse('reset_password', kwargs={'uidb64': uidb64, 'token': token})
+            )
+
+            # Send email
+            subject = 'Password Reset Request - Transport Management System (TMS)'
+            message = (
+                f"Hello {user.username},\n\n"
+                f"We received a request to reset the password for your Transport Management System (TMS) account.\n\n"
+                f"Please click the link below to set a new password:\n"
+                f"{reset_url}\n\n"
+                f"This link will expire for security reasons. If you did not make this request, you can safely ignore this email.\n\n"
+                f"Warm regards,\n"
+                f"Transport Management System Team"
+            )
+
+            email_sent = False
+            try:
+                from_email = getattr(settings, 'EMAIL_HOST_USER', 'tmsdjango@gmail.com')
+                send_mail(
+                    subject,
+                    message,
+                    from_email,
+                    [user.email],
+                    fail_silently=False
+                )
+                email_sent = True
+            except Exception:
+                email_sent = False
+
+            return render(request, 'forgot_password.html', {
+                'success': True,
+                'email': user.email,
+                'email_sent': email_sent,
+                'reset_url': reset_url,
+            })
+        else:
+            error = f"No account found matching '{identifier}'. Please check your input or register a new account."
+            messages.error(request, error)
+            return render(request, 'forgot_password.html', {'error': error, 'identifier': identifier})
+
+    return render(request, 'forgot_password.html')
+
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is None or not default_token_generator.check_token(user, token):
+        error = "This password reset link is invalid or has expired. Please request a new one."
+        messages.error(request, error)
+        return render(request, 'reset_password.html', {'invalid_token': True, 'error': error})
+
+    if request.method == 'POST':
+        password = request.POST.get('password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        if not password or not confirm_password:
+            error = "Both password fields are required."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        if password != confirm_password:
+            error = "Passwords do not match. Please ensure both fields are identical."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        # Password complexity validation
+        if len(password) < 8:
+            error = "Password must be at least 8 characters long."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        if not re.search(r'[A-Z]', password):
+            error = "Password must contain at least one uppercase letter (A-Z)."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        if not re.search(r'[a-z]', password):
+            error = "Password must contain at least one lowercase letter (a-z)."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        if not re.search(r'\d', password):
+            error = "Password must contain at least one number (0-9)."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        if not re.search(r'[@$!%*?&_\-#~^+=<>;:,.]', password):
+            error = "Password must contain at least one special character (@$!%*?&_ etc.)."
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        # Enforce Django AUTH_PASSWORD_VALIDATORS from settings
+        try:
+            validate_password(password, user=user)
+        except ValidationError as e:
+            error = " ".join(e.messages)
+            messages.error(request, error)
+            return render(request, 'reset_password.html', {'error': error, 'uidb64': uidb64, 'token': token, 'user': user})
+
+        # Set new password
+        user.set_password(password)
+        user.save()
+
+        messages.success(request, f"Password for account '{user.username}' has been successfully reset! Please log in with your new password.")
+        return redirect('login')
+
+    return render(request, 'reset_password.html', {'uidb64': uidb64, 'token': token, 'user': user})
 
 
 User = get_user_model()
