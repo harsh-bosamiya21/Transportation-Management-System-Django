@@ -76,6 +76,8 @@ WSGI_APPLICATION = 'tms_app.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 import sys
+import os
+
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
@@ -83,7 +85,12 @@ if 'test' in sys.argv:
             'NAME': ':memory:',
         }
     }
-else:
+elif os.environ.get('USE_MYSQL') == '1':
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+    except ImportError:
+        pass
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -92,6 +99,13 @@ else:
             'PASSWORD': '123',
             'HOST': 'localhost',
             'PORT': '3306',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
